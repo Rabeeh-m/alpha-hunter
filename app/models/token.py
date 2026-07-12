@@ -37,11 +37,11 @@ class Token(Base, TimestampMixin):
     decimals: Mapped[int] = mapped_column(default=18, nullable=False)
 
     dex: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    liquidity_usd: Mapped[Decimal | None] = mapped_column(Numeric(24, 8), nullable=True)
-    market_cap_usd: Mapped[Decimal | None] = mapped_column(Numeric(24, 8), nullable=True)
-    fdv_usd: Mapped[Decimal | None] = mapped_column(Numeric(24, 8), nullable=True)
-    volume_24h_usd: Mapped[Decimal | None] = mapped_column(Numeric(24, 8), nullable=True)
-    price_usd: Mapped[Decimal | None] = mapped_column(Numeric(36, 18), nullable=True)
+    liquidity_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
+    market_cap_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
+    fdv_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
+    volume_24h_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
+    price_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 18), nullable=True)
     holder_count: Mapped[int | None] = mapped_column(nullable=True)
 
     def __repr__(self) -> str:

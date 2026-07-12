@@ -31,6 +31,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pre-commit>=4.0.1",
     "respx>=0.21.1",   # mocks httpx for tests
+    "apscheduler>=3.10.4",
 ]
 
 [build-system]
@@ -58,5 +59,6 @@ exclude = ["tests/"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
 testpaths = ["app/tests"]
 addopts = "-v --cov=app --cov-report=term-missing"

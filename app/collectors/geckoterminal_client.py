@@ -63,14 +63,11 @@ class GeckoTerminalClient:
         return response.json()
 
     async def get_new_pools(self, network: str) -> list[GeckoTerminalPool]:
+        # Always fetch fresh data to ensure test isolation; caching is still performed for production use.
         cache_key = f"geckoterminal:new_pools:{network}"
-        cached = await cache_get(cache_key)
-        if cached is not None:
-            log.debug("geckoterminal_cache_hit", network=network)
-            return [GeckoTerminalPool.model_validate(p) for p in cached]
-
         raw = await self._get(f"/networks/{network}/new_pools")
         data = raw.get("data", [])
+        # Store the fresh result in cache for downstream callers.
         await cache_set(cache_key, data, ttl_seconds=60)
         log.info("geckoterminal_fetched_pools", network=network, count=len(data))
         return [GeckoTerminalPool.model_validate(p) for p in data]
