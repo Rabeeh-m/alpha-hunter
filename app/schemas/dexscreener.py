@@ -1,0 +1,36 @@
+from __future__ import annotations
+
+from pydantic import BaseModel, Field
+
+
+class DexScreenerTokenProfile(BaseModel):
+    """One entry from GET /token-profiles/latest/v1."""
+
+    chain_id: str = Field(alias="chainId")
+    token_address: str = Field(alias="tokenAddress")
+
+
+class DexScreenerLiquidity(BaseModel):
+    usd: float | None = None
+
+
+class DexScreenerToken(BaseModel):
+    address: str
+    name: str | None = None
+    symbol: str | None = None
+
+
+class DexScreenerPair(BaseModel):
+    """One entry from GET /latest/dex/tokens/{address}."""
+
+    chain_id: str = Field(alias="chainId")
+    dex_id: str | None = Field(default=None, alias="dexId")
+    pair_address: str | None = Field(default=None, alias="pairAddress")
+    base_token: DexScreenerToken = Field(alias="baseToken")
+    price_usd: str | None = Field(default=None, alias="priceUsd")
+    liquidity: DexScreenerLiquidity | None = None
+    fdv: float | None = None
+    market_cap: float | None = Field(default=None, alias="marketCap")
+    volume: dict[str, float] | None = None
+
+    model_config = {"populate_by_name": True}
