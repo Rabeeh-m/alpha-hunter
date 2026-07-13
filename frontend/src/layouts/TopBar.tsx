@@ -4,7 +4,8 @@ import { useTokens } from "../hooks/useTokens";
 
 export function TopBar() {
     const { theme, toggleTheme, sidebarCollapsed, toggleSidebar } = useUiStore();
-    const { data: tokens } = useTokens(15, 0);
+    const { data } = useTokens({ page_size: 15 });
+    const tokens = data?.items;
 
     return (
         <header className="flex h-14 items-center gap-4 border-b border-border px-4">

@@ -72,3 +72,7 @@ class RepositoryError(AlphaHunterError):
 class ExternalAPIError(AlphaHunterError):
     error_code = "EXTERNAL_API_ERROR"
     recoverable = True
+
+class InvalidSortField(AlphaHunterError):
+    error_code = "INVALID_SORT_FIELD"
+    recoverable = True

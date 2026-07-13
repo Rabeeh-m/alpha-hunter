@@ -4,9 +4,8 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
-from sqlalchemy import Enum as SAEnum
+from sqlalchemy import Enum as SAEnum, Uuid
 from sqlalchemy import Integer, String, Text, DateTime
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -31,7 +30,7 @@ class JobRun(Base):
 
     __tablename__ = "job_runs"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     job_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     correlation_id: Mapped[str] = mapped_column(String(64), nullable=False)
 

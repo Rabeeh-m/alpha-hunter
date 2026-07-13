@@ -4,6 +4,15 @@ from pydantic import BaseModel
 from app.models.chain import Chain
 from decimal import Decimal
 
+class TokenPage(BaseModel):
+    items: list["TokenRead"]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+    model_config = {"from_attributes": True}
+
 class TokenCreate(BaseModel):
     chain: Chain
     contract_address: str

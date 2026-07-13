@@ -8,15 +8,6 @@ from app.models.token import Token
 from app.repositories.token_repository import TokenRepository
 
 
-@pytest.fixture
-async def db_session():
-    from app.core.database.session import async_session_factory
-
-    async with async_session_factory() as session:
-        yield session
-        await session.rollback()  # never persist test data
-
-
 async def test_add_and_fetch_token(db_session: AsyncSession):
     repo = TokenRepository(db_session)
     token = Token(

@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokens } from "../api/tokens";
+import type { TokenQueryParams } from "../types/tokens";
 
-export function useTokens(limit = 50, offset = 0) {
+export function useTokens(params: TokenQueryParams = {}) {
   return useQuery({
-    queryKey: ["tokens", limit, offset],
-    queryFn: () => fetchTokens(limit, offset),
-    staleTime: 30_000, // matches backend's 60s cache TTL loosely — avoid refetch storms
+    queryKey: ["tokens", params],
+    queryFn: () => fetchTokens(params),
+    staleTime: 30_000,
     refetchInterval: 60_000,
   });
 }

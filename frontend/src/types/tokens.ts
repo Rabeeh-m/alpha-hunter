@@ -18,3 +18,21 @@ export interface Token {
   holder_count: number | null;
   created_at: string;
 }
+
+export interface TokenQueryParams {
+  search?: string;
+  chain?: Chain;
+  min_liquidity?: number;
+  min_volume?: number;
+  sort?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export interface TokenPage {
+  items: Token[];
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
+}
