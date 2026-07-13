@@ -43,3 +43,13 @@ class TokenRead(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+    
+class TokenSnapshotRead(BaseModel):
+    captured_at: datetime
+    price_usd: Decimal | None
+    liquidity_usd: Decimal | None
+    volume_24h_usd: Decimal | None
+    market_cap_usd: Decimal | None
+    fdv_usd: Decimal | None
+
+    model_config = {"from_attributes": True}

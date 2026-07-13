@@ -1,15 +1,16 @@
 from __future__ import annotations
-
 from decimal import Decimal
-
+from datetime import UTC, datetime, timedelta
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.database import get_db
 from app.core.exceptions import InvalidSortField
 from app.models.chain import Chain
 from app.repositories.token_repository import TokenRepository
-from app.schemas.token import TokenPage, TokenRead
+from app.schemas.token import TokenPage, TokenRead, TokenSnapshotRead
+from app.repositories.token_snapshot_repository import TokenSnapshotRepository
+
 
 router = APIRouter(prefix="/tokens", tags=["tokens"])
 
@@ -46,3 +47,33 @@ async def list_tokens(
         items=[TokenRead.model_validate(t) for t in tokens],
         page=page, page_size=page_size, total=total, total_pages=total_pages,
     )
+    
+    
+@router.get("/{token_id}", response_model=TokenRead)
+async def get_token(token_id: UUID, db: AsyncSession = Depends(get_db)) -> TokenRead:
+    repo = TokenRepository(db)
+    token = await repo.get_by_id(token_id)
+    if token is None:
+        raise HTTPException(status_code=404, detail=f"Token '{token_id}' not found")
+    return TokenRead.model_validate(token)
+
+
+@router.get("/{token_id}/snapshots", response_model=list[TokenSnapshotRead])
+async def get_token_snapshots(
+    token_id: UUID,
+    hours: int = Query(default=24, ge=1, le=720),
+    limit: int = Query(default=500, ge=1, le=2000),
+    db: AsyncSession = Depends(get_db),
+) -> list[TokenSnapshotRead]:
+    """Historical readings for charting. Empty list (not 404) if the
+    token exists but has no snapshots yet -- e.g. discovered less than
+    one ingestion cycle ago."""
+    token_repo = TokenRepository(db)
+    token = await token_repo.get_by_id(token_id)
+    if token is None:
+        raise HTTPException(status_code=404, detail=f"Token '{token_id}' not found")
+
+    snapshot_repo = TokenSnapshotRepository(db)
+    since = datetime.now(UTC) - timedelta(hours=hours)
+    snapshots = await snapshot_repo.list_for_token(token_id, since=since, limit=limit)
+    return [TokenSnapshotRead.model_validate(s) for s in snapshots]

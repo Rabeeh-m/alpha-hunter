@@ -29,10 +29,11 @@ class _FakeProvider:
 
 async def test_ingest_all_deduplicates_across_providers():
     repository = AsyncMock()
+    snapshot_repository = AsyncMock()
     provider_a = _FakeProvider("provider-a", "0xsame")
     provider_b = _FakeProvider("provider-b", "0xsame")
 
-    service = TokenIngestionService([provider_a, provider_b], repository)
+    service = TokenIngestionService([provider_a, provider_b], repository, snapshot_repository)
     results = await service.ingest_all()
 
     assert results == {"provider-a": 1, "provider-b": 1}
