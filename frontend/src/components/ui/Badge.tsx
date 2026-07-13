@@ -1,21 +1,26 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 
 const variants = {
-  gain: "bg-accent-gain/10 text-accent-gain border-accent-gain/30",
-  loss: "bg-accent-loss/10 text-accent-loss border-accent-loss/30",
-  signal: "bg-accent-signal/10 text-accent-signal border-accent-signal/30",
-  neutral: "bg-bg-elevated text-text-muted border-border",
+  success: "bg-brand-success-light text-brand-success border-brand-success/20",
+  danger: "bg-brand-danger-light text-brand-danger border-brand-danger/20",
+  warning: "bg-brand-warning-light text-brand-warning border-brand-warning/20",
+  info: "bg-brand-info-light text-brand-info border-brand-info/20",
+  neutral: "bg-bg-elevated text-text-secondary border-border",
+  primary: "bg-brand-primary-light text-brand-primary border-brand-primary/20",
 };
 
 export function Badge({
   children,
   variant = "neutral",
+  className,
 }: {
   children: ReactNode;
   variant?: keyof typeof variants;
+  className?: string;
 }) {
   return (
-    <span className={`inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-mono ${variants[variant]}`}>
+    <span className={clsx("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", variants[variant], className)}>
       {children}
     </span>
   );

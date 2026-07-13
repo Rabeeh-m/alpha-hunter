@@ -6,6 +6,29 @@ function formatUsd(value: string | null): string {
   return `$${Number(value).toLocaleString(undefined, { maximumFractionDigits: 6 })}`;
 }
 
+const chainVariant = (chain: string) => {
+  const map: Record<string, "info" | "warning" | "success" | "primary" | "neutral"> = {
+    ethereum: "info",
+    base: "primary",
+    solana: "warning",
+    bnb_chain: "warning",
+    arbitrum: "info",
+    polygon: "primary",
+    avalanche: "danger",
+    optimism: "success",
+  };
+  return map[chain] ?? "neutral";
+};
+
+const statVariants = [
+  "border-l-brand-primary",
+  "border-l-brand-success",
+  "border-l-brand-info",
+  "border-l-brand-warning",
+  "border-l-brand-danger",
+  "border-l-brand-primary",
+];
+
 export function OverviewTab({ token }: { token: Token }) {
   const stats = [
     { label: "Price", value: formatUsd(token.price_usd) },
@@ -18,19 +41,19 @@ export function OverviewTab({ token }: { token: Token }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2">
-        <Badge variant="neutral">{token.chain}</Badge>
-        {token.dex && <Badge variant="signal">{token.dex}</Badge>}
+      <div className="mb-5 flex items-center gap-2">
+        <Badge variant={chainVariant(token.chain)}>{token.chain}</Badge>
+        {token.dex && <Badge variant="info">{token.dex}</Badge>}
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded border border-border bg-bg-surface p-4">
-            <p className="text-xs text-text-muted">{s.label}</p>
-            <p className="mt-1 font-mono text-lg text-text-primary">{s.value}</p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {stats.map((s, i) => (
+          <div key={s.label} className={`rounded-xl border border-border bg-bg-surface p-5 shadow-card transition-all hover:shadow-card-hover border-l-4 ${statVariants[i]}`}>
+            <p className="text-xs font-medium tracking-wide text-text-muted uppercase">{s.label}</p>
+            <p className="mt-2 font-mono text-xl font-bold tabular-nums text-text-primary">{s.value}</p>
           </div>
         ))}
       </div>
-      <p className="mt-4 font-mono text-xs text-text-faint break-all">
+      <p className="mt-5 rounded-xl border border-border bg-bg-surface px-4 py-3 font-mono text-xs text-text-muted break-all">
         {token.contract_address}
       </p>
     </div>

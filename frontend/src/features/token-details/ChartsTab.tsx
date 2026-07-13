@@ -6,7 +6,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 export function ChartsTab({ tokenId }: { tokenId: string }) {
   const { data: snapshots, isLoading } = useTokenSnapshots(tokenId, 24);
 
-  if (isLoading) return <Skeleton className="h-64 w-full" />;
+  if (isLoading) return <Skeleton className="h-64 w-full rounded-xl" />;
 
   if (!snapshots || snapshots.length < 2) {
     return (
@@ -25,28 +25,44 @@ export function ChartsTab({ tokenId }: { tokenId: string }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="mb-2 text-xs text-text-muted">Price (24h)</p>
+      <div className="rounded-xl border border-border bg-bg-surface p-5 shadow-card">
+        <p className="mb-4 text-xs font-medium tracking-wide text-text-muted uppercase">Price (24h)</p>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1F2733" />
-            <XAxis dataKey="time" stroke="#5A6479" fontSize={11} />
-            <YAxis stroke="#5A6479" fontSize={11} domain={["auto", "auto"]} />
-            <Tooltip contentStyle={{ background: "#12161F", border: "1px solid #1F2733", fontSize: 12 }} />
-            <Line type="monotone" dataKey="price" stroke="#22D3B8" dot={false} strokeWidth={1.5} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
+            <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={11} tickMargin={8} />
+            <YAxis stroke="var(--text-muted)" fontSize={11} domain={["auto", "auto"]} tickMargin={8} />
+            <Tooltip
+              contentStyle={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-default)",
+                borderRadius: "12px",
+                fontSize: 12,
+                boxShadow: "0 10px 35px rgba(15,23,42,.08)",
+              }}
+            />
+            <Line type="monotone" dataKey="price" stroke="var(--brand-success)" dot={false} strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div>
-        <p className="mb-2 text-xs text-text-muted">Liquidity (24h)</p>
+      <div className="rounded-xl border border-border bg-bg-surface p-5 shadow-card">
+        <p className="mb-4 text-xs font-medium tracking-wide text-text-muted uppercase">Liquidity (24h)</p>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1F2733" />
-            <XAxis dataKey="time" stroke="#5A6479" fontSize={11} />
-            <YAxis stroke="#5A6479" fontSize={11} />
-            <Tooltip contentStyle={{ background: "#12161F", border: "1px solid #1F2733", fontSize: 12 }} />
-            <Line type="monotone" dataKey="liquidity" stroke="#F0B429" dot={false} strokeWidth={1.5} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
+            <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={11} tickMargin={8} />
+            <YAxis stroke="var(--text-muted)" fontSize={11} tickMargin={8} />
+            <Tooltip
+              contentStyle={{
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-default)",
+                borderRadius: "12px",
+                fontSize: 12,
+                boxShadow: "0 10px 35px rgba(15,23,42,.08)",
+              }}
+            />
+            <Line type="monotone" dataKey="liquidity" stroke="var(--brand-info)" dot={false} strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>

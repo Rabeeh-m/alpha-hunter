@@ -5,6 +5,7 @@ import { OverviewTab } from "../features/token-details/OverviewTab";
 import { ChartsTab } from "../features/token-details/ChartsTab";
 import { Skeleton } from "../components/ui/Skeleton";
 import { ErrorState } from "../components/ui/ErrorState";
+import clsx from "clsx";
 
 const LIVE_TABS = ["Overview", "Charts"] as const;
 const PLACEHOLDER_TABS = [
@@ -20,28 +21,34 @@ export function TokenDetailsPage() {
 
   return (
     <div>
-      {isLoading && <Skeleton className="h-8 w-48 mb-4" />}
-      {!isLoading && token && (
-        <h1 className="mb-4 font-mono text-lg text-text-primary">{token.symbol}</h1>
-      )}
+      <div className="mb-6">
+        {isLoading && <Skeleton className="h-8 w-48 mb-2" />}
+        {!isLoading && token && (
+          <h1 className="text-2xl font-semibold tracking-tight text-text-primary">{token.symbol}</h1>
+        )}
+      </div>
 
-      <div className="mb-4 flex gap-1 overflow-x-auto border-b border-border">
+      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
         {ALL_TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-2 text-sm whitespace-nowrap ${
+            className={clsx(
+              "relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors",
               activeTab === tab
-                ? "border-b-2 border-accent-gain text-text-primary"
-                : "text-text-muted hover:text-text-primary"
-            }`}
+                ? "text-brand-primary"
+                : "text-text-muted hover:text-text-secondary"
+            )}
           >
             {tab}
+            {activeTab === tab && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-primary rounded-full" />
+            )}
           </button>
         ))}
       </div>
 
-      {isLoading && <Skeleton className="h-40 w-full" />}
+      {isLoading && <Skeleton className="h-48 w-full rounded-xl" />}
       {isError && <ErrorState message={(error as Error).message} onRetry={() => refetch()} />}
 
       {!isLoading && !isError && token && (
@@ -49,7 +56,7 @@ export function TokenDetailsPage() {
           {activeTab === "Overview" && <OverviewTab token={token} />}
           {activeTab === "Charts" && <ChartsTab tokenId={token.id} />}
           {!LIVE_TABS.includes(activeTab as (typeof LIVE_TABS)[number]) && (
-            <div className="py-12 text-center text-sm text-text-muted">
+            <div className="py-16 text-center text-sm text-text-muted">
               {activeTab} — implemented in a future milestone.
             </div>
           )}

@@ -4,7 +4,7 @@ import { Badge } from "./Badge";
 
 describe("Badge", () => {
     it("renders its children", () => {
-        render(<Badge variant="gain">base</Badge>);
+        render(<Badge variant="success">base</Badge>);
         expect(screen.getByText("base")).toBeInTheDocument();
     });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, RefreshCw, Search } from "lucide-react";
 import { useTokens } from "../hooks/useTokens";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { Skeleton } from "../components/ui/Skeleton";
@@ -30,6 +30,20 @@ function formatUsd(value: string | null): string {
   return `$${n.toFixed(2)}`;
 }
 
+const chainVariant = (chain: string) => {
+  const map: Record<string, "info" | "warning" | "success" | "primary" | "neutral"> = {
+    ethereum: "info",
+    base: "primary",
+    solana: "warning",
+    bnb_chain: "warning",
+    arbitrum: "info",
+    polygon: "primary",
+    avalanche: "danger",
+    optimism: "success",
+  };
+  return map[chain] ?? "neutral";
+};
+
 export function ScreenerPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,7 +55,6 @@ export function ScreenerPage() {
   const sort = searchParams.get("sort") ?? "-created_at";
   const page = Number(searchParams.get("page") ?? "1");
 
-  // URL is the single source of truth for filters -- shareable, survives refresh.
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
     if (debouncedSearch) next.set("search", debouncedSearch);
@@ -70,24 +83,31 @@ export function ScreenerPage() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-text-primary">Token Screener</h1>
-        <button onClick={() => refetch()} className="rounded border border-border px-3 py-1.5 text-sm text-text-muted hover:bg-bg-elevated hover:text-text-primary">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-text-primary">Token Screener</h1>
+          <p className="mt-1 text-sm text-text-secondary">Discover and filter tokens across chains</p>
+        </div>
+        <button onClick={() => refetch()} className="inline-flex items-center gap-2 rounded-xl border border-border bg-bg-surface px-4 py-2.5 text-sm font-medium text-text-secondary shadow-card transition-all hover:bg-bg-hover hover:text-text-primary hover:shadow-card-hover">
+          <RefreshCw size={14} />
           Refresh
         </button>
       </div>
 
       <div className="mb-4 flex flex-wrap gap-3">
-        <input
-          value={localSearch}
-          onChange={(e) => setLocalSearch(e.target.value)}
-          placeholder="Search symbol or name..."
-          className="rounded border border-border bg-bg-elevated px-3 py-1.5 text-sm text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-1 focus:ring-accent-gain"
-        />
+        <div className="relative flex-1 max-w-xs">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+          <input
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            placeholder="Search symbol or name..."
+            className="w-full rounded-xl border border-border bg-bg-surface py-2.5 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted shadow-card transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary"
+          />
+        </div>
         <select
           value={chain ?? ""}
           onChange={(e) => updateParam("chain", e.target.value || null)}
-          className="rounded border border-border bg-bg-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-gain"
+          className="rounded-xl border border-border bg-bg-surface px-3 py-2.5 text-sm text-text-primary shadow-card transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:border-brand-primary"
         >
           <option value="">All chains</option>
           {CHAINS.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -98,45 +118,45 @@ export function ScreenerPage() {
 
       {!isError && (
         <>
-          <div className="overflow-x-auto rounded border border-border">
+          <div className="overflow-hidden rounded-xl border border-border bg-bg-surface shadow-card">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-bg-surface text-left text-xs text-text-muted">
+                <tr className="border-b border-border bg-bg text-left text-xs text-text-muted">
                   {SORTABLE_COLUMNS.map((col) => {
                     const isActive = sort.replace("-", "") === col.key;
                     const isDesc = sort === `-${col.key}`;
                     return (
-                      <th key={col.key} onClick={() => toggleSort(col.key)} className="cursor-pointer select-none px-4 py-2 font-medium hover:text-text-primary">
-                        <span className="inline-flex items-center gap-1">
+                      <th key={col.key} onClick={() => toggleSort(col.key)} className="cursor-pointer select-none px-5 py-3.5 font-semibold uppercase tracking-wider hover:text-text-primary transition-colors">
+                        <span className="inline-flex items-center gap-1.5">
                           {col.label}
                           {isActive && (isDesc ? <ChevronDown size={12} /> : <ChevronUp size={12} />)}
                         </span>
                       </th>
                     );
                   })}
-                  <th className="px-4 py-2 font-medium">Chain</th>
+                  <th className="px-5 py-3.5 font-semibold uppercase tracking-wider">Chain</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading &&
                   Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} className="border-b border-border">
+                    <tr key={i} className="border-b border-border-light">
                       {Array.from({ length: 7 }).map((_, j) => (
-                        <td key={j} className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                        <td key={j} className="px-5 py-4"><Skeleton className="h-4 w-20" /></td>
                       ))}
                     </tr>
                   ))}
 
                 {!isLoading &&
                   data?.items.map((token) => (
-                    <tr key={token.id} onClick={() => navigate(`/tokens/${token.id}`)} className="cursor-pointer border-b border-border font-mono text-xs hover:bg-bg-surface">
-                      <td className="px-4 py-3 font-sans font-medium text-text-primary">{token.symbol}</td>
-                      <td className="px-4 py-3 font-tabular">{formatUsd(token.price_usd)}</td>
-                      <td className="px-4 py-3 font-tabular">{formatUsd(token.volume_24h_usd)}</td>
-                      <td className="px-4 py-3 font-tabular">{formatUsd(token.liquidity_usd)}</td>
-                      <td className="px-4 py-3 font-tabular">{formatUsd(token.fdv_usd)}</td>
-                      <td className="px-4 py-3 font-tabular">{formatUsd(token.market_cap_usd)}</td>
-                      <td className="px-4 py-3"><Badge variant="neutral">{token.chain}</Badge></td>
+                    <tr key={token.id} onClick={() => navigate(`/tokens/${token.id}`)} className="cursor-pointer border-b border-border-light transition-colors hover:bg-bg-hover last:border-0">
+                      <td className="px-5 py-4 font-medium text-text-primary">{token.symbol}</td>
+                      <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-primary">{formatUsd(token.price_usd)}</td>
+                      <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.volume_24h_usd)}</td>
+                      <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.liquidity_usd)}</td>
+                      <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.fdv_usd)}</td>
+                      <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.market_cap_usd)}</td>
+                      <td className="px-5 py-4"><Badge variant={chainVariant(token.chain)}>{token.chain}</Badge></td>
                     </tr>
                   ))}
               </tbody>
@@ -148,13 +168,21 @@ export function ScreenerPage() {
           </div>
 
           {data && data.total_pages > 1 && (
-            <div className="mt-4 flex items-center justify-between text-sm text-text-muted">
-              <span>Page {data.page} of {data.total_pages} — {data.total} tokens</span>
+            <div className="mt-4 flex items-center justify-between text-sm">
+              <span className="text-text-muted">Page {data.page} of {data.total_pages} — {data.total} tokens</span>
               <div className="flex gap-2">
-                <button disabled={page <= 1} onClick={() => updateParam("page", String(page - 1), false)} className="rounded border border-border px-3 py-1 disabled:opacity-30">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => updateParam("page", String(page - 1), false)}
+                  className="rounded-xl border border-border bg-bg-surface px-4 py-2 text-sm font-medium text-text-secondary shadow-card transition-all hover:bg-bg-hover hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                >
                   Prev
                 </button>
-                <button disabled={page >= data.total_pages} onClick={() => updateParam("page", String(page + 1), false)} className="rounded border border-border px-3 py-1 disabled:opacity-30">
+                <button
+                  disabled={page >= data.total_pages}
+                  onClick={() => updateParam("page", String(page + 1), false)}
+                  className="rounded-xl border border-border bg-bg-surface px-4 py-2 text-sm font-medium text-text-secondary shadow-card transition-all hover:bg-bg-hover hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40"
+                >
                   Next
                 </button>
               </div>

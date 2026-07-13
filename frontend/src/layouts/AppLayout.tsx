@@ -19,16 +19,20 @@ export function AppLayout() {
   }, [theme]);
 
   return (
-    <div className="flex h-screen bg-bg">
+    <div className="flex h-screen bg-bg text-text-primary">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-7xl px-6 py-8">
+            <ErrorBoundary>
+              <div className="animate-fade-in">
+                <Outlet />
+              </div>
+            </ErrorBoundary>
+          </div>
         </main>
-        <footer className="border-t border-border px-6 py-2 text-xs text-text-faint">
+        <footer className="border-t border-border px-6 py-3 text-center text-xs text-text-muted">
           Alpha Hunter — research tool, not financial advice.
         </footer>
       </div>
