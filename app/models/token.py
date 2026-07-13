@@ -9,7 +9,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base, TimestampMixin
 from app.models.chain import Chain
+from typing import TYPE_CHECKING
 
+from sqlalchemy.orm import relationship
+
+if TYPE_CHECKING:
+    from app.models.alpha_score import AlphaScore
 
 class Token(Base, TimestampMixin):
     """
@@ -42,6 +47,6 @@ class Token(Base, TimestampMixin):
     volume_24h_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
     price_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 18), nullable=True)
     holder_count: Mapped[int | None] = mapped_column(nullable=True)
-
+    alpha_score: Mapped["AlphaScore | None"] = relationship(back_populates="token", uselist=False, lazy="selectin")
     def __repr__(self) -> str:
         return f"<Token {self.symbol} ({self.chain}:{self.contract_address[:10]}...)>"

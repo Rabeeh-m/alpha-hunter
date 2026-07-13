@@ -3,6 +3,8 @@ from uuid import UUID
 from pydantic import BaseModel
 from app.models.chain import Chain
 from decimal import Decimal
+from app.models.token import Token
+
 
 class TokenPage(BaseModel):
     items: list["TokenRead"]
@@ -43,6 +45,18 @@ class TokenRead(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+    
+    alpha_score: Decimal | None = None
+    alpha_score_breakdown: dict | None = None
+
+    @classmethod
+    def from_token(cls, token: Token) -> "TokenRead":
+        """Plain model_validate(token) can't flatten this -- token.alpha_score
+        is a related AlphaScore object, not the Decimal this schema expects."""
+        data = {c.name: getattr(token, c.name) for c in Token.__table__.columns}
+        data["alpha_score"] = token.alpha_score.score if token.alpha_score else None
+        data["alpha_score_breakdown"] = token.alpha_score.factor_breakdown if token.alpha_score else None
+        return cls(**data)
     
 class TokenSnapshotRead(BaseModel):
     captured_at: datetime

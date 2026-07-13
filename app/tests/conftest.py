@@ -47,8 +47,11 @@ async def db_session(test_engine) -> AsyncSession:
     )
 
     async with async_session_factory() as session:
-        async with session.begin():
+        await session.begin()
+        try:
             yield session
-            # Rollback is implicit when the transaction context exits
+        finally:
+            await session.rollback()
+            await session.close()
 
 

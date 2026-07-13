@@ -5,7 +5,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.logging import get_logger
 from app.scheduler.execution import execute_job
-from app.scheduler.jobs import refresh_dexscreener, refresh_geckoterminal
+from app.scheduler.jobs import refresh_dexscreener, refresh_geckoterminal, compute_alpha_scores
 from app.scheduler.registry import JobDefinition, job_registry
 
 log = get_logger(__name__)
@@ -30,6 +30,14 @@ def _register_jobs() -> None:
             category="collector",
             func=refresh_geckoterminal,
             interval_seconds=90,
+        ),
+        JobDefinition(
+            id="compute_alpha_scores",
+            name="Alpha Score Ranking Pass",
+            description="Recompute explainable alpha scores for all tokens",
+            category="ranking",
+            func=compute_alpha_scores,
+            interval_seconds=120,  
         ),
     ]
 

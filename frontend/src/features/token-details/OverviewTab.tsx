@@ -1,5 +1,6 @@
 import type { Token } from "../../types/tokens";
 import { Badge } from "../../components/ui/Badge";
+import { AlphaBreakdownPanel } from "./AlphaBreakdownPanel";
 
 function formatUsd(value: string | null): string {
   if (value === null) return "—";
@@ -46,6 +47,11 @@ export function OverviewTab({ token }: { token: Token }) {
         {token.dex && <Badge variant="info">{token.dex}</Badge>}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {token.alpha_score_breakdown && (
+        <div className="mt-4">
+          <AlphaBreakdownPanel breakdown={token.alpha_score_breakdown} />
+        </div>
+      )}
         {stats.map((s, i) => (
           <div key={s.label} className={`rounded-xl border border-border bg-bg-surface p-5 shadow-card transition-all hover:shadow-card-hover border-l-4 ${statVariants[i]}`}>
             <p className="text-xs font-medium tracking-wide text-text-muted uppercase">{s.label}</p>

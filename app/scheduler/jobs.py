@@ -6,6 +6,8 @@ from app.core.database.session import async_session_factory
 from app.repositories.token_repository import TokenRepository
 from app.services.token_ingestion_service import TokenIngestionService
 from app.repositories.token_snapshot_repository import TokenSnapshotRepository
+from app.repositories.alpha_score_repository import AlphaScoreRepository
+from app.services.ranking_service import RankingService
 
 
 async def refresh_dexscreener() -> dict[str, int]:
@@ -34,3 +36,14 @@ async def refresh_geckoterminal() -> dict[str, int]:
             return results
     finally:
         await provider.close()
+        
+
+async def compute_alpha_scores() -> dict[str, int]:
+    async with async_session_factory() as session:
+        token_repo = TokenRepository(session)
+        snapshot_repo = TokenSnapshotRepository(session)
+        alpha_score_repo = AlphaScoreRepository(session)
+        service = RankingService(token_repo, snapshot_repo, alpha_score_repo)
+        count = await service.compute_all()
+        await session.commit()
+        return {"tokens_scored": count}

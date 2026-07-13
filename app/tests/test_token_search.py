@@ -53,3 +53,12 @@ async def test_search_pagination(seeded_repo):
     assert total == 3
     assert len(page_1) == 2
     assert len(page_2) == 1
+    
+
+async def test_search_sorts_by_alpha_score(db_session, seeded_tokens):
+    """Confirms the outerjoin doesn't break existing search/filter/sort
+    behavior even when no token has a score yet -- nulls_last() should
+    put all of them at the bottom without erroring."""
+    repo = TokenRepository(db_session)
+    results, total = await repo.search(sort="-alpha_score")
+    assert total == 3  # unchanged from the other seeded_tokens tests

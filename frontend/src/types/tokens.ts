@@ -3,6 +3,8 @@ export type Chain =
   | "arbitrum" | "polygon" | "avalanche" | "optimism";
 
 export interface Token {
+  alpha_score_breakdown: any;
+  alpha_score: string;
   id: string;
   chain: Chain;
   contract_address: string;
@@ -36,3 +38,13 @@ export interface TokenPage {
   total: number;
   total_pages: number;
 }
+
+export interface AlphaFactorBreakdown {
+  liquidity: { score: number; weight: number };
+  volume: { score: number; weight: number };
+  market_cap: { score: number; weight: number };
+  age: { score: number; weight: number };
+  liquidity_growth: { score: number; weight: number };
+  composite: number;
+}
+

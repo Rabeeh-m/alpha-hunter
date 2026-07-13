@@ -44,7 +44,7 @@ async def list_tokens(
     total_pages = (total + page_size - 1) // page_size if total else 0
 
     return TokenPage(
-        items=[TokenRead.model_validate(t) for t in tokens],
+        items=[TokenRead.from_token(t) for t in tokens],
         page=page, page_size=page_size, total=total, total_pages=total_pages,
     )
     
@@ -55,7 +55,7 @@ async def get_token(token_id: UUID, db: AsyncSession = Depends(get_db)) -> Token
     token = await repo.get_by_id(token_id)
     if token is None:
         raise HTTPException(status_code=404, detail=f"Token '{token_id}' not found")
-    return TokenRead.model_validate(token)
+    return TokenRead.from_token(token)
 
 
 @router.get("/{token_id}/snapshots", response_model=list[TokenSnapshotRead])

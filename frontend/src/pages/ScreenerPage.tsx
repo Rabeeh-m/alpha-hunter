@@ -8,6 +8,8 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { ErrorState } from "../components/ui/ErrorState";
 import { Badge } from "../components/ui/Badge";
 import type { Chain } from "../types/tokens";
+import { AlphaScoreBadge } from "../components/ui/AlphaScoreBadge";
+
 
 const CHAINS: Chain[] = [
   "ethereum", "base", "solana", "bnb_chain", "arbitrum", "polygon", "avalanche", "optimism",
@@ -20,6 +22,7 @@ const SORTABLE_COLUMNS = [
   { key: "liquidity_usd", label: "Liquidity" },
   { key: "fdv_usd", label: "FDV" },
   { key: "market_cap_usd", label: "Mkt Cap" },
+  { key: "alpha_score", label: "Alpha" },
 ] as const;
 
 function formatUsd(value: string | null): string {
@@ -141,7 +144,7 @@ export function ScreenerPage() {
                 {isLoading &&
                   Array.from({ length: 8 }).map((_, i) => (
                     <tr key={i} className="border-b border-border-light">
-                      {Array.from({ length: 7 }).map((_, j) => (
+                      {Array.from({ length: 8 }).map((_, j) => (
                         <td key={j} className="px-5 py-4"><Skeleton className="h-4 w-20" /></td>
                       ))}
                     </tr>
@@ -156,6 +159,7 @@ export function ScreenerPage() {
                       <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.liquidity_usd)}</td>
                       <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.fdv_usd)}</td>
                       <td className="px-5 py-4 font-mono text-sm tabular-nums text-text-secondary">{formatUsd(token.market_cap_usd)}</td>
+                      <td className="px-4 py-3"><AlphaScoreBadge score={token.alpha_score} /></td>
                       <td className="px-5 py-4"><Badge variant={chainVariant(token.chain)}>{token.chain}</Badge></td>
                     </tr>
                   ))}

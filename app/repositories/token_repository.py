@@ -10,6 +10,7 @@ from decimal import Decimal
 from sqlalchemy import func, or_, select
 from sqlalchemy.sql.elements import ColumnElement
 from app.core.exceptions import InvalidSortField
+from app.models.alpha_score import AlphaScore
 
 # Whitelisted sort fields -- a client-supplied sort string is NEVER
 # interpolated into ORDER BY. Only keys listed here are reachable;
@@ -22,6 +23,7 @@ SORTABLE_FIELDS: dict[str, ColumnElement] = {
     "market_cap_usd": Token.market_cap_usd,
     "fdv_usd": Token.fdv_usd,
     "created_at": Token.created_at,
+    "alpha_score": AlphaScore.score,
 }
 
 class TokenRepository(BaseRepository[Token]):
@@ -96,8 +98,8 @@ class TokenRepository(BaseRepository[Token]):
         if min_volume is not None:
             conditions.append(Token.volume_24h_usd >= min_volume)
 
-        base_query = select(Token)
-        count_query = select(func.count()).select_from(Token)
+        base_query = select(Token).outerjoin(AlphaScore, Token.id == AlphaScore.token_id)
+        count_query = select(func.count()).select_from(Token).outerjoin(AlphaScore, Token.id == AlphaScore.token_id)
         for condition in conditions:
             base_query = base_query.where(condition)
             count_query = count_query.where(condition)
