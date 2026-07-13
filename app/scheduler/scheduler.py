@@ -13,7 +13,7 @@ log = get_logger(__name__)
 scheduler = AsyncIOScheduler()
 
 
-def _register_jobs() -> None:
+def register_jobs() -> None:
     definitions = [
         JobDefinition(
             id="refresh_dexscreener",
@@ -49,13 +49,12 @@ def _register_jobs() -> None:
                 trigger=IntervalTrigger(seconds=job_def.interval_seconds),
                 args=[job_def],
                 id=job_def.id,
-                max_instances=1,  # in-process guard; Redis lock in execute_job covers multi-process
+                max_instances=1,
                 replace_existing=True,
             )
 
-
 def start_scheduler() -> None:
-    _register_jobs()
+    register_jobs()
     scheduler.start()
     log.info("scheduler_started", job_count=len(job_registry.all()))
 

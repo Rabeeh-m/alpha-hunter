@@ -44,6 +44,8 @@ def normalize_pool(pool: GeckoTerminalPool, network: str) -> TokenCreate | None:
     name = attrs.name or "Unknown"
     # GeckoTerminal's pool "name" is often "TOKEN / WETH" — take the symbol-looking part
     symbol = name.split("/")[0].strip() if "/" in name else name
+    # Truncate to fit the Symbol column (String(32)) to avoid truncation errors
+    symbol = symbol[:32]
 
     return TokenCreate(
         chain=chain,

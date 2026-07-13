@@ -41,7 +41,7 @@ def normalize_pair(pair: DexScreenerPair) -> TokenCreate | None:
         contract_address=pair.base_token.address,
         pair_address=pair.pair_address,
         name=pair.base_token.name or "Unknown",
-        symbol=pair.base_token.symbol or "UNKNOWN",
+        symbol=(pair.base_token.symbol or "UNKNOWN")[:32],
         dex=pair.dex_id,
         liquidity_usd=_to_decimal(pair.liquidity.usd if pair.liquidity else None),
         market_cap_usd=_to_decimal(pair.market_cap),
