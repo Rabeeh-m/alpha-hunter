@@ -108,7 +108,7 @@ Manual crypto research is slow, fragmented across a dozen tools, and biased towa
 
 ## 2. Features
 
-### V1 — Core Screener *(in progress)*
+### V1 — Core Screener ✅ complete
 - [x] Project scaffolding, config management, structured logging
 - [x] Async SQLAlchemy + Alembic + PostgreSQL persistence
 - [x] DexScreener collector (cached, retried, upserted)
