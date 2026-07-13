@@ -33,6 +33,7 @@ dev = [
     "pre-commit>=4.0.1",
     "respx>=0.21.1",   # mocks httpx for tests
     "apscheduler>=3.10.4",
+    "locust>=2.32.0",
 ]
 
 [project.scripts]

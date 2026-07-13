@@ -54,3 +54,35 @@ def test_normalize_pair_returns_none_for_unsupported_chain():
     pair = DexScreenerPair.model_validate(unsupported)
 
     assert normalize_pair(pair) is None
+    
+
+async def test_client_retries_then_succeeds_after_transient_500(http_client, monkeypatch):
+    """Proves the tenacity retry decorator actually retries -- not just
+    that it's present in the code. First two calls 500, third succeeds."""
+    call_count = 0
+
+    def _handler(request: httpx.Request) -> httpx.Response:
+        nonlocal call_count
+        call_count += 1
+        if call_count < 3:
+            return httpx.Response(500)
+        return httpx.Response(200, json={"pairs": [MOCK_PAIR]})
+
+    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xtoken456").mock(side_effect=_handler)
+
+    client = DexScreenerClient(http_client=http_client)
+    pairs = await client.get_pairs_for_token("base", "0xtoken456")
+
+    assert call_count == 3
+    assert len(pairs) == 1
+
+
+@respx.mock
+async def test_client_raises_after_exhausting_retries(http_client):
+    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xtoken456").mock(
+        return_value=httpx.Response(503)
+    )
+
+    client = DexScreenerClient(http_client=http_client)
+    with pytest.raises(httpx.HTTPStatusError):
+        await client.get_pairs_for_token("base", "0xtoken456")
