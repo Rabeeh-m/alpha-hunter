@@ -6,6 +6,7 @@ from app.cli.commands import db as db_commands
 from app.cli.commands import ingest as ingest_commands
 from app.cli.commands import jobs as jobs_commands
 from app.cli.commands import rank as rank_commands
+from app.cli.commands import wallets as wallets_commands
 
 app = typer.Typer(
     name="alpha-hunter",
@@ -17,7 +18,7 @@ app.add_typer(jobs_commands.jobs_app, name="jobs")
 app.add_typer(db_commands.db_app, name="db")
 app.command(name="ingest")(ingest_commands.ingest)
 app.command(name="rank")(rank_commands.rank)
-
+app.add_typer(wallets_commands.wallets_app, name="wallets")
 
 if __name__ == "__main__":
     app()

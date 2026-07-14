@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import httpx
 import pytest
+from apscheduler.triggers.interval import IntervalTrigger
 
 from app.scheduler.registry import JobDefinition, job_registry
+from app.scheduler.scheduler import scheduler
 
 
 async def _dummy_job() -> dict[str, int]:
@@ -20,8 +22,19 @@ def _register_test_job():
         category="test", func=_dummy_job, interval_seconds=60,
     )
     job_registry.register(test_job)
+    scheduler.add_job(
+        _dummy_job,
+        trigger=IntervalTrigger(seconds=60),
+        id="test-api-job",
+        max_instances=1,
+        replace_existing=True,
+    )
     yield
     job_registry._jobs.pop("test-api-job", None)
+    try:
+        scheduler.remove_job("test-api-job")
+    except Exception:
+        pass
 
 
 @pytest.fixture

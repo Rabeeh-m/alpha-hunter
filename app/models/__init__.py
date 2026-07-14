@@ -3,5 +3,10 @@ from app.models.chain import Chain
 from app.models.job_run import JobRun, JobStatus
 from app.models.token import Token
 from app.models.token_snapshot import TokenSnapshot
+from app.models.wallet import Wallet, WalletType
+from app.models.wallet_holding import WalletHolding
 
-__all__ = ["AlphaScore", "Chain", "JobRun", "JobStatus", "Token", "TokenSnapshot"]
+__all__ = [
+    "AlphaScore", "Chain", "JobRun", "JobStatus", "Token",
+    "TokenSnapshot", "Wallet", "WalletHolding", "WalletType",
+]

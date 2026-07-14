@@ -6,11 +6,11 @@ import { ChartsTab } from "../features/token-details/ChartsTab";
 import { Skeleton } from "../components/ui/Skeleton";
 import { ErrorState } from "../components/ui/ErrorState";
 import clsx from "clsx";
+import { WhalesTab } from "../features/token-details/WhalesTab";
 
-const LIVE_TABS = ["Overview", "Charts"] as const;
+const LIVE_TABS = ["Overview", "Charts", "Whales"] as const;
 const PLACEHOLDER_TABS = [
-  "Liquidity", "Transactions", "Whales", "Social",
-  "Developer", "Contract", "Narratives", "Risk",
+  "Liquidity", "Transactions", "Social", "Developer", "Contract", "Narratives", "Risk",
 ];
 const ALL_TABS = [...LIVE_TABS, ...PLACEHOLDER_TABS];
 
@@ -55,6 +55,7 @@ export function TokenDetailsPage() {
         <>
           {activeTab === "Overview" && <OverviewTab token={token} />}
           {activeTab === "Charts" && <ChartsTab tokenId={token.id} />}
+          {activeTab === "Whales" && <WhalesTab tokenId={token.id} />}
           {!LIVE_TABS.includes(activeTab as (typeof LIVE_TABS)[number]) && (
             <div className="py-16 text-center text-sm text-text-muted">
               {activeTab} — implemented in a future milestone.

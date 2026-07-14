@@ -34,7 +34,7 @@ function formatUsd(value: string | null): string {
 }
 
 const chainVariant = (chain: string) => {
-  const map: Record<string, "info" | "warning" | "success" | "primary" | "neutral"> = {
+  const map: Record<string, "info" | "warning" | "success" | "primary" | "neutral" | "danger"> = {
     ethereum: "info",
     base: "primary",
     solana: "warning",

@@ -56,7 +56,8 @@ def test_normalize_pair_returns_none_for_unsupported_chain():
     assert normalize_pair(pair) is None
     
 
-async def test_client_retries_then_succeeds_after_transient_500(http_client, monkeypatch):
+@respx.mock
+async def test_client_retries_then_succeeds_after_transient_500(http_client):
     """Proves the tenacity retry decorator actually retries -- not just
     that it's present in the code. First two calls 500, third succeeds."""
     call_count = 0
@@ -68,10 +69,10 @@ async def test_client_retries_then_succeeds_after_transient_500(http_client, mon
             return httpx.Response(500)
         return httpx.Response(200, json={"pairs": [MOCK_PAIR]})
 
-    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xtoken456").mock(side_effect=_handler)
+    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xretrytest").mock(side_effect=_handler)
 
     client = DexScreenerClient(http_client=http_client)
-    pairs = await client.get_pairs_for_token("base", "0xtoken456")
+    pairs = await client.get_pairs_for_token("base", "0xretrytest")
 
     assert call_count == 3
     assert len(pairs) == 1
@@ -79,10 +80,10 @@ async def test_client_retries_then_succeeds_after_transient_500(http_client, mon
 
 @respx.mock
 async def test_client_raises_after_exhausting_retries(http_client):
-    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xtoken456").mock(
+    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xexhausttest").mock(
         return_value=httpx.Response(503)
     )
 
     client = DexScreenerClient(http_client=http_client)
     with pytest.raises(httpx.HTTPStatusError):
-        await client.get_pairs_for_token("base", "0xtoken456")
+        await client.get_pairs_for_token("base", "0xexhausttest")

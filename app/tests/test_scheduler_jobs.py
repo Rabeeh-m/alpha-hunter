@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -18,7 +18,7 @@ def mock_session_factory():
     mock_session.__aenter__.return_value = mock_session
     mock_session.__aexit__.return_value = None
 
-    mock_factory = AsyncMock(return_value=mock_session)
+    mock_factory = MagicMock(return_value=mock_session)
     return mock_factory, mock_session
 
 

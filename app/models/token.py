@@ -31,7 +31,7 @@ class Token(Base, TimestampMixin):
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
 
     chain: Mapped[Chain] = mapped_column(
-        SAEnum(Chain, name="chain_enum"), nullable=False, index=True
+        SAEnum(Chain, name="chain_enum", create_type=False), nullable=False, index=True
     )
     contract_address: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     pair_address: Mapped[str | None] = mapped_column(String(64), nullable=True)
