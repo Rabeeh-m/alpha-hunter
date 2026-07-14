@@ -5,8 +5,9 @@ from app.models.token import Token
 from app.models.token_snapshot import TokenSnapshot
 from app.models.wallet import Wallet, WalletType
 from app.models.wallet_holding import WalletHolding
+from app.models.contract_security import ContractSecurity
 
 __all__ = [
     "AlphaScore", "Chain", "JobRun", "JobStatus", "Token",
-    "TokenSnapshot", "Wallet", "WalletHolding", "WalletType",
+    "TokenSnapshot", "Wallet", "WalletHolding", "WalletType", "ContractSecurity"
 ]
