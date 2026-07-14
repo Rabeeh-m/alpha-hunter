@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 
 from app.models.chain import Chain
@@ -36,6 +37,10 @@ def normalize_pair(pair: DexScreenerPair) -> TokenCreate | None:
     if chain is None:
         return None
 
+    pair_created_at: datetime | None = None
+    if pair.pair_created_at is not None:
+        pair_created_at = datetime.fromtimestamp(pair.pair_created_at / 1000, tz=UTC)
+
     return TokenCreate(
         chain=chain,
         contract_address=pair.base_token.address,
@@ -48,4 +53,5 @@ def normalize_pair(pair: DexScreenerPair) -> TokenCreate | None:
         fdv_usd=_to_decimal(pair.fdv),
         volume_24h_usd=_to_decimal((pair.volume or {}).get("h24")),
         price_usd=_to_decimal(pair.price_usd),
+        pair_created_at=pair_created_at,
     )

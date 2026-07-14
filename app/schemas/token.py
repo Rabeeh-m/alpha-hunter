@@ -1,8 +1,10 @@
 from datetime import datetime
-from uuid import UUID
-from pydantic import BaseModel
-from app.models.chain import Chain
 from decimal import Decimal
+from uuid import UUID
+
+from pydantic import BaseModel
+
+from app.models.chain import Chain
 from app.models.token import Token
 
 
@@ -27,6 +29,7 @@ class TokenCreate(BaseModel):
     fdv_usd: Decimal | None = None
     volume_24h_usd: Decimal | None = None
     price_usd: Decimal | None = None
+    pair_created_at: datetime | None = None
 
 class TokenRead(BaseModel):
     id: UUID
@@ -43,9 +46,10 @@ class TokenRead(BaseModel):
     price_usd: Decimal | None
     holder_count: int | None
     created_at: datetime
+    pair_created_at: datetime | None = None
 
     model_config = {"from_attributes": True}
-    
+
     alpha_score: Decimal | None = None
     alpha_score_breakdown: dict | None = None
 
@@ -57,7 +61,7 @@ class TokenRead(BaseModel):
         data["alpha_score"] = token.alpha_score.score if token.alpha_score else None
         data["alpha_score_breakdown"] = token.alpha_score.factor_breakdown if token.alpha_score else None
         return cls(**data)
-    
+
 class TokenSnapshotRead(BaseModel):
     captured_at: datetime
     price_usd: Decimal | None

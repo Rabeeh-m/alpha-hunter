@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, RefreshCw, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, RefreshCw, Search } from "lucide-react";
 import { useTokens } from "../hooks/useTokens";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 import { Skeleton } from "../components/ui/Skeleton";
@@ -14,6 +14,19 @@ import { AlphaScoreBadge } from "../components/ui/AlphaScoreBadge";
 const CHAINS: Chain[] = [
   "ethereum", "base", "solana", "bnb_chain", "arbitrum", "polygon", "avalanche", "optimism",
 ];
+
+const TIME_WINDOWS = [
+  { label: "1H", hours: 1 },
+  { label: "3H", hours: 3 },
+  { label: "6H", hours: 6 },
+  { label: "12H", hours: 12 },
+  { label: "1D", hours: 24 },
+  { label: "2D", hours: 48 },
+  { label: "3D", hours: 72 },
+  { label: "5D", hours: 120 },
+  { label: "7D", hours: 168 },
+  { label: "All", hours: 0 },
+] as const;
 
 const SORTABLE_COLUMNS = [
   { key: "symbol", label: "Token" },
@@ -55,8 +68,10 @@ export function ScreenerPage() {
   const debouncedSearch = useDebouncedValue(localSearch, 400);
 
   const chain = (searchParams.get("chain") as Chain) || undefined;
-  const sort = searchParams.get("sort") ?? "-created_at";
+  const sort = searchParams.get("sort") ?? "-volume_24h_usd";
   const page = Number(searchParams.get("page") ?? "1");
+  const rawWindow = searchParams.get("window");
+  const activeWindow = rawWindow ? Number(rawWindow) : 24;
 
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
@@ -79,9 +94,14 @@ export function ScreenerPage() {
     updateParam("sort", sort === `-${key}` ? key : `-${key}`, false);
   }
 
+  function setTimeWindow(hours: number) {
+    updateParam("window", hours > 0 ? String(hours) : null);
+  }
+
   const { data, isLoading, isError, error, refetch } = useTokens({
     search: searchParams.get("search") || undefined,
     chain, sort, page, page_size: 25,
+    created_within_hours: activeWindow || undefined,
   });
 
   return (
@@ -115,6 +135,23 @@ export function ScreenerPage() {
           <option value="">All chains</option>
           {CHAINS.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
+      </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        <Clock size={14} className="mr-1 text-text-muted" />
+        {TIME_WINDOWS.map((w) => (
+          <button
+            key={w.hours}
+            onClick={() => setTimeWindow(w.hours)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+              activeWindow === w.hours
+                ? "bg-brand-primary text-white shadow-sm"
+                : "bg-bg-surface text-text-secondary hover:bg-bg-hover hover:text-text-primary border border-border"
+            }`}
+          >
+            {w.label}
+          </button>
+        ))}
       </div>
 
       {isError && <ErrorState message={(error as Error).message} onRetry={() => refetch()} />}

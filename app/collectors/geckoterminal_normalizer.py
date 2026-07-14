@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
+from typing import TYPE_CHECKING
 
 from app.models.chain import Chain
-from app.schemas.geckoterminal import GeckoTerminalPool
 from app.schemas.token import TokenCreate
+
+if TYPE_CHECKING:
+    from app.schemas.geckoterminal import GeckoTerminalPool
 
 # GeckoTerminal network slug -> our internal Chain enum
 _CHAIN_MAP: dict[str, Chain] = {
@@ -47,6 +51,10 @@ def normalize_pool(pool: GeckoTerminalPool, network: str) -> TokenCreate | None:
     # Truncate to fit the Symbol column (String(32)) to avoid truncation errors
     symbol = symbol[:32]
 
+    pair_created_at: datetime | None = None
+    if attrs.pool_created_at is not None:
+        pair_created_at = datetime.fromisoformat(attrs.pool_created_at.replace("Z", "+00:00"))
+
     return TokenCreate(
         chain=chain,
         contract_address=contract_address,
@@ -57,4 +65,5 @@ def normalize_pool(pool: GeckoTerminalPool, network: str) -> TokenCreate | None:
         fdv_usd=_to_decimal(attrs.fdv_usd),
         volume_24h_usd=_to_decimal((attrs.volume_usd or {}).get("h24")),
         price_usd=_to_decimal(attrs.base_token_price_usd),
+        pair_created_at=pair_created_at,
     )

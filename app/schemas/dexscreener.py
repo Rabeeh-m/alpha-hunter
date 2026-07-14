@@ -32,5 +32,6 @@ class DexScreenerPair(BaseModel):
     fdv: float | None = None
     market_cap: float | None = Field(default=None, alias="marketCap")
     volume: dict[str, float] | None = None
+    pair_created_at: int | None = Field(default=None, alias="pairCreatedAt")
 
     model_config = {"populate_by_name": True}

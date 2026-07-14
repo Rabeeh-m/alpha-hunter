@@ -1,16 +1,20 @@
 from __future__ import annotations
 
-from sqlalchemy import select
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
+from typing import TYPE_CHECKING
 
+from sqlalchemy import func, or_, select
+
+from app.core.exceptions import InvalidSortField
+from app.models.alpha_score import AlphaScore
 from app.models.chain import Chain
 from app.models.token import Token
 from app.repositories.base import BaseRepository
 from app.schemas.token import TokenCreate
-from decimal import Decimal
-from sqlalchemy import func, or_, select
-from sqlalchemy.sql.elements import ColumnElement
-from app.core.exceptions import InvalidSortField
-from app.models.alpha_score import AlphaScore
+
+if TYPE_CHECKING:
+    from sqlalchemy.sql.elements import ColumnElement
 
 # Whitelisted sort fields -- a client-supplied sort string is NEVER
 # interpolated into ORDER BY. Only keys listed here are reachable;
@@ -23,6 +27,7 @@ SORTABLE_FIELDS: dict[str, ColumnElement] = {
     "market_cap_usd": Token.market_cap_usd,
     "fdv_usd": Token.fdv_usd,
     "created_at": Token.created_at,
+    "pair_created_at": Token.pair_created_at,
     "alpha_score": AlphaScore.score,
 }
 
@@ -60,7 +65,8 @@ class TokenRepository(BaseRepository[Token]):
         chain: Chain | None = None,
         min_liquidity: Decimal | None = None,
         min_volume: Decimal | None = None,
-        sort: str = "-created_at",
+        created_within_hours: int | None = None,
+        sort: str = "-volume_24h_usd",
         page: int = 1,
         page_size: int = 25,
     ) -> tuple[list[Token], int]:
@@ -70,6 +76,9 @@ class TokenRepository(BaseRepository[Token]):
         'liquidity_usd' (asc). The leading '-' is the only parsing done on
         client input -- the field name is looked up in SORTABLE_FIELDS,
         never interpolated into SQL.
+
+        `created_within_hours` filters to tokens whose pair was created
+        on-chain within the last N hours. Uses `pair_created_at`.
         """
         descending = sort.startswith("-")
         field_key = sort[1:] if descending else sort
@@ -82,9 +91,6 @@ class TokenRepository(BaseRepository[Token]):
             )
 
         order_column = column.desc() if descending else column.asc()
-        # nulls last regardless of direction -- a token with unknown
-        # liquidity must never outrank a known-low-liquidity token just
-        # because Postgres sorts NULL first by default on ASC.
         order_clause = order_column.nulls_last()
 
         conditions = []
@@ -97,6 +103,9 @@ class TokenRepository(BaseRepository[Token]):
             conditions.append(Token.liquidity_usd >= min_liquidity)
         if min_volume is not None:
             conditions.append(Token.volume_24h_usd >= min_volume)
+        if created_within_hours is not None:
+            cutoff = datetime.now(UTC) - timedelta(hours=created_within_hours)
+            conditions.append(Token.pair_created_at >= cutoff)
 
         base_query = select(Token).outerjoin(AlphaScore, Token.id == AlphaScore.token_id)
         count_query = select(func.count()).select_from(Token).outerjoin(AlphaScore, Token.id == AlphaScore.token_id)

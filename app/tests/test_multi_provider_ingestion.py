@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from unittest.mock import AsyncMock
 
 import pytest
@@ -23,6 +24,7 @@ class _FakeProvider:
                 contract_address=self._contract_address,
                 name="Dedup Test Token",
                 symbol="DEDUP",
+                liquidity_usd=Decimal("50000"),
             )
         ]
 

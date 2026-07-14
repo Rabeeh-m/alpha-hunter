@@ -19,6 +19,7 @@ export interface Token {
   price_usd: string | null;
   holder_count: number | null;
   created_at: string;
+  pair_created_at: string | null;
 }
 
 export interface TokenQueryParams {
@@ -29,6 +30,7 @@ export interface TokenQueryParams {
   sort?: string;
   page?: number;
   page_size?: number;
+  created_within_hours?: number;
 }
 
 export interface TokenPage {

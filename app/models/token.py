@@ -1,17 +1,16 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import Enum as SAEnum, Uuid
-from sqlalchemy import Numeric, String, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, Numeric, String, UniqueConstraint, Uuid
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base, TimestampMixin
 from app.models.chain import Chain
-from typing import TYPE_CHECKING
-
-from sqlalchemy.orm import relationship
 
 if TYPE_CHECKING:
     from app.models.alpha_score import AlphaScore
@@ -41,12 +40,13 @@ class Token(Base, TimestampMixin):
     decimals: Mapped[int] = mapped_column(default=18, nullable=False)
 
     dex: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    liquidity_usd: Mapped[Decimal | None] = mapped_column(Numeric(24, 8), nullable=True, index=True)    
+    liquidity_usd: Mapped[Decimal | None] = mapped_column(Numeric(24, 8), nullable=True, index=True)
     market_cap_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
     fdv_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
     volume_24h_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
     price_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 18), nullable=True)
     holder_count: Mapped[int | None] = mapped_column(nullable=True)
-    alpha_score: Mapped["AlphaScore | None"] = relationship(back_populates="token", uselist=False, lazy="selectin")
+    pair_created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    alpha_score: Mapped[AlphaScore | None] = relationship(back_populates="token", uselist=False, lazy="selectin")
     def __repr__(self) -> str:
         return f"<Token {self.symbol} ({self.chain}:{self.contract_address[:10]}...)>"
