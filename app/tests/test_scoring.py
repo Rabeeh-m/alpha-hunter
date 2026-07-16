@@ -6,6 +6,7 @@ from decimal import Decimal
 import pytest
 
 from app.ranking.scoring import age_score, liquidity_growth_score, liquidity_score, market_cap_score
+from app.ranking.scoring import contract_safety_score
 
 
 def test_liquidity_score_clips_below_floor():
@@ -57,3 +58,16 @@ def test_market_cap_score_penalizes_size_v1_simplification():
     higher for now, even though that's not quite right for a discovery
     tool. See the docstring on market_cap_score() for the plan to fix this."""
     assert market_cap_score(Decimal("40000000")) > market_cap_score(Decimal("500000"))
+    
+
+def test_contract_safety_score_passes_through_directly():
+    assert contract_safety_score(85) == 85.0
+
+
+def test_contract_safety_score_none_is_neutral():
+    assert contract_safety_score(None) == 50.0
+
+
+def test_weights_still_sum_to_one():
+    from app.ranking.scoring import WEIGHTS
+    assert abs(sum(WEIGHTS.values()) - 1.0) < 0.0001

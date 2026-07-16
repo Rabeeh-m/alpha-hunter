@@ -8,11 +8,13 @@ from app.models.token import Token
 from app.ranking.scoring import (
     ScoreBreakdown,
     age_score,
+    contract_safety_score,
     liquidity_growth_score,
     liquidity_score,
     market_cap_score,
     volume_score,
 )
+from app.repositories.contract_security_repository import ContractSecurityRepository
 from app.repositories.alpha_score_repository import AlphaScoreRepository
 from app.repositories.token_repository import TokenRepository
 from app.repositories.token_snapshot_repository import TokenSnapshotRepository
@@ -21,24 +23,25 @@ log = get_logger(__name__)
 
 
 class RankingService:
-    """Orchestrates score computation: pulls a token's current state plus
-    its 24h snapshot history, runs it through the pure scoring functions,
-    and persists the result. Never talks to APIs or the scheduler directly."""
-
     def __init__(
         self,
         token_repository: TokenRepository,
         snapshot_repository: TokenSnapshotRepository,
         alpha_score_repository: AlphaScoreRepository,
+        contract_security_repository: ContractSecurityRepository,
     ) -> None:
         self._token_repo = token_repository
         self._snapshot_repo = snapshot_repository
         self._alpha_score_repo = alpha_score_repository
+        self._contract_security_repo = contract_security_repository
 
     async def compute_for_token(self, token: Token) -> Decimal:
         since = datetime.now(UTC) - timedelta(hours=24)
         snapshots = await self._snapshot_repo.list_for_token(token.id, since=since)
         earliest_liquidity = snapshots[0].liquidity_usd if snapshots else None
+
+        security = await self._contract_security_repo.get_by_token_id(token.id)
+        safety_score = security.safety_score if security is not None else None
 
         breakdown = ScoreBreakdown(
             liquidity=liquidity_score(token.liquidity_usd),
@@ -46,6 +49,7 @@ class RankingService:
             market_cap=market_cap_score(token.market_cap_usd),
             age=age_score(token.created_at, datetime.now(UTC)),
             liquidity_growth=liquidity_growth_score(earliest_liquidity, token.liquidity_usd),
+            contract_safety=contract_safety_score(safety_score),
         )
 
         score = Decimal(str(breakdown.composite))

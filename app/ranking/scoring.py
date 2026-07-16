@@ -13,11 +13,12 @@ from decimal import Decimal
 # eventually learn weights from real historical outcomes instead of
 # these best-guess constants.
 WEIGHTS: dict[str, float] = {
-    "liquidity": 0.25,
-    "volume": 0.20,
-    "market_cap": 0.15,
-    "age": 0.15,
-    "liquidity_growth": 0.25,
+    "liquidity": 0.20,
+    "volume": 0.15,
+    "market_cap": 0.10,
+    "age": 0.10,
+    "liquidity_growth": 0.20,
+    "contract_safety": 0.25,
 }
 
 
@@ -86,6 +87,7 @@ class ScoreBreakdown:
     market_cap: float
     age: float
     liquidity_growth: float
+    contract_safety: float
 
     @property
     def composite(self) -> float:
@@ -97,3 +99,19 @@ class ScoreBreakdown:
         }
         result["composite"] = self.composite
         return result
+    
+    
+def contract_safety_score(safety_score: int | None) -> float:
+    """Directly uses ContractSecurity.safety_score (already 0-100, from
+    M13's compute_contract_risk) -- no further transformation needed,
+    unlike the log-scale USD factors above.
+
+    None (never scanned) returns 50, matching compute_contract_risk's
+    own "no data = neutral" convention from M13 -- an unscanned token
+    should score the same here as one GoPlus has no data for, since
+    from the ranking engine's perspective they're indistinguishable:
+    absence of a security opinion either way.
+    """
+    if safety_score is None:
+        return 50.0
+    return float(safety_score)
