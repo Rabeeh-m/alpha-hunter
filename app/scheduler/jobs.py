@@ -9,7 +9,14 @@ from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.repositories.alpha_score_repository import AlphaScoreRepository
 from app.services.ranking_service import RankingService
 from app.repositories.contract_security_repository import ContractSecurityRepository
+from app.blockchain.chain_ids import is_evm_chain
+from app.collectors.etherscan_client import EtherscanClient
+from app.repositories.wallet_holding_repository import WalletHoldingRepository
+from app.repositories.wallet_repository import WalletRepository
+from app.repositories.whale_event_repository import WhaleEventRepository
+from app.services.wallet_discovery_service import WalletDiscoveryService
 
+TOP_N_TOKENS_FOR_WHALE_MONITORING = 10  # bounded scope -- see milestone note on rate limits
 
 async def refresh_dexscreener() -> dict[str, int]:
     provider = DexScreenerProvider()
@@ -49,3 +56,35 @@ async def compute_alpha_scores() -> dict[str, int]:
         count = await service.compute_all()
         await session.commit()
         return {"tokens_scored": count}
+    
+
+async def scan_top_tokens_for_whale_activity() -> dict[str, int]:
+    """Automatic whale monitoring, DELIBERATELY BOUNDED to the top N
+    tokens by alpha_score, not the full token universe -- unlimited
+    scheduled scanning would scale Etherscan API usage with total token
+    count, which the free tier can't sustain. This is the compromise
+    between 'no automation at all' (M11's original stance) and 'true
+    real-time for everything' (would need a paid tier)."""
+    client = EtherscanClient()
+    scanned = 0
+    try:
+        async with async_session_factory() as session:
+            token_repo = TokenRepository(session)
+            tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_WHALE_MONITORING)
+
+            wallet_repo = WalletRepository(session)
+            holding_repo = WalletHoldingRepository(session)
+            whale_event_repo = WhaleEventRepository(session)
+            service = WalletDiscoveryService(client, wallet_repo, holding_repo, whale_event_repo)
+
+            for token in tokens:
+                if not is_evm_chain(token.chain):
+                    continue  # Solana still out of scope, see M11
+                await service.scan_token(token)
+                scanned += 1
+
+            await session.commit()
+    finally:
+        await client.close()
+
+    return {"tokens_scanned": scanned}

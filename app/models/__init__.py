@@ -6,8 +6,9 @@ from app.models.token_snapshot import TokenSnapshot
 from app.models.wallet import Wallet, WalletType
 from app.models.wallet_holding import WalletHolding
 from app.models.contract_security import ContractSecurity
+from app.models.whale_event import WhaleEvent, WhaleEventType
 
 __all__ = [
     "AlphaScore", "Chain", "JobRun", "JobStatus", "Token",
-    "TokenSnapshot", "Wallet", "WalletHolding", "WalletType", "ContractSecurity"
+    "TokenSnapshot", "Wallet", "WalletHolding", "WalletType", "ContractSecurity", "WhaleEvent", "WhaleEventType"
 ]

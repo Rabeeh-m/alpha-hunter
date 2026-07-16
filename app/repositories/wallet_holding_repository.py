@@ -12,7 +12,12 @@ from app.repositories.base import BaseRepository
 class WalletHoldingRepository(BaseRepository[WalletHolding]):
     model = WalletHolding
 
-    async def upsert(self, token_id: UUID, wallet_id: UUID, balance: Decimal, rank: int) -> WalletHolding:
+    async def upsert(
+        self, token_id: UUID, wallet_id: UUID, balance: Decimal, rank: int
+    ) -> tuple[WalletHolding, Decimal | None]:
+        """Returns (holding, previous_balance) -- previous_balance is None
+        for a first-time holding, which callers use to distinguish
+        NEW_POSITION from INCREASED/DECREASED (see whale_detection.py)."""
         result = await self.session.execute(
             select(WalletHolding).where(
                 WalletHolding.token_id == token_id, WalletHolding.wallet_id == wallet_id
@@ -20,13 +25,14 @@ class WalletHoldingRepository(BaseRepository[WalletHolding]):
         )
         existing = result.scalar_one_or_none()
         if existing is not None:
+            previous_balance = existing.approximate_balance
             existing.approximate_balance = balance
             existing.rank = rank
             await self.session.flush()
-            return existing
+            return existing, previous_balance
 
         holding = WalletHolding(token_id=token_id, wallet_id=wallet_id, approximate_balance=balance, rank=rank)
-        return await self.add(holding)
+        return await self.add(holding), None
 
     async def list_for_token(self, token_id: UUID, limit: int = 20) -> list[WalletHolding]:
         result = await self.session.execute(

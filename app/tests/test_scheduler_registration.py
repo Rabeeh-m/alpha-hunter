@@ -9,7 +9,7 @@ def test_register_jobs_populates_registry():
     register_jobs()
 
     ids = {j.id for j in job_registry.all()}
-    assert ids == {"refresh_dexscreener", "refresh_geckoterminal", "compute_alpha_scores"}
+    assert ids == {"refresh_dexscreener", "refresh_geckoterminal", "compute_alpha_scores", "scan_top_tokens_for_whale_activity"}
 
 
 def test_register_jobs_adds_apscheduler_jobs():

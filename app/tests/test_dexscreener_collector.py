@@ -6,6 +6,7 @@ import respx
 
 from app.collectors.dexscreener_client import DexScreenerClient
 from app.collectors.dexscreener_normalizer import normalize_pair
+from app.core.cache import get_redis
 from app.schemas.dexscreener import DexScreenerPair
 
 MOCK_PAIR = {
@@ -60,6 +61,10 @@ def test_normalize_pair_returns_none_for_unsupported_chain():
 async def test_client_retries_then_succeeds_after_transient_500(http_client):
     """Proves the tenacity retry decorator actually retries -- not just
     that it's present in the code. First two calls 500, third succeeds."""
+    # Clear any cached data from prior runs so the mock handler gets called
+    redis = get_redis()
+    await redis.delete("dexscreener:pairs:base:0xretrytest")
+
     call_count = 0
 
     def _handler(request: httpx.Request) -> httpx.Response:

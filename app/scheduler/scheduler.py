@@ -5,7 +5,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.logging import get_logger
 from app.scheduler.execution import execute_job
-from app.scheduler.jobs import refresh_dexscreener, refresh_geckoterminal, compute_alpha_scores
+from app.scheduler.jobs import compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_whale_activity
 from app.scheduler.registry import JobDefinition, job_registry
 
 log = get_logger(__name__)
@@ -38,6 +38,14 @@ def register_jobs() -> None:
             category="ranking",
             func=compute_alpha_scores,
             interval_seconds=120,  
+        ),
+        JobDefinition(
+            id="scan_top_tokens_for_whale_activity",
+            name="Whale Activity Scan (Top 10 Tokens)",
+            description="Re-scan top-ranked tokens' holders to detect balance changes -- bounded scope, see docstring",
+            category="whale-monitoring",
+            func=scan_top_tokens_for_whale_activity,
+            interval_seconds=1200,  # 20min -- balances rate-limit exposure against monitoring freshness
         ),
     ]
 
