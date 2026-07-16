@@ -48,6 +48,6 @@ export interface AlphaFactorBreakdown {
   age: { score: number; weight: number };
   liquidity_growth: { score: number; weight: number };
   contract_safety: { score: number; weight: number };
+  social_signal: { score: number; weight: number };
   composite: number;
 }
-

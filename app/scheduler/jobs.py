@@ -19,6 +19,7 @@ from app.collectors.telegram_client import TelegramClient
 from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository
 from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
+from app.repositories.social_score_repository import SocialScoreRepository
 
 TOP_N_TOKENS_FOR_SOCIAL_MONITORING = 10
 TOP_N_TOKENS_FOR_WHALE_MONITORING = 10  # bounded scope -- see milestone note on rate limits
@@ -57,7 +58,10 @@ async def compute_alpha_scores() -> dict[str, int]:
         snapshot_repo = TokenSnapshotRepository(session)
         alpha_score_repo = AlphaScoreRepository(session)
         contract_security_repo = ContractSecurityRepository(session)
-        service = RankingService(token_repo, snapshot_repo, alpha_score_repo, contract_security_repo)
+        social_score_repo = SocialScoreRepository(session)
+        service = RankingService(
+            token_repo, snapshot_repo, alpha_score_repo, contract_security_repo, social_score_repo
+        )
         count = await service.compute_all()
         await session.commit()
         return {"tokens_scored": count}

@@ -13,12 +13,13 @@ from decimal import Decimal
 # eventually learn weights from real historical outcomes instead of
 # these best-guess constants.
 WEIGHTS: dict[str, float] = {
-    "liquidity": 0.20,
-    "volume": 0.15,
-    "market_cap": 0.10,
-    "age": 0.10,
-    "liquidity_growth": 0.20,
-    "contract_safety": 0.25,
+    "liquidity": 0.18,
+    "volume": 0.13,
+    "market_cap": 0.09,
+    "age": 0.09,
+    "liquidity_growth": 0.18,
+    "contract_safety": 0.23,
+    "social_signal": 0.10,
 }
 
 
@@ -88,6 +89,7 @@ class ScoreBreakdown:
     age: float
     liquidity_growth: float
     contract_safety: float
+    social_signal: float
 
     @property
     def composite(self) -> float:
@@ -115,3 +117,22 @@ def contract_safety_score(safety_score: int | None) -> float:
     if safety_score is None:
         return 50.0
     return float(safety_score)
+
+
+def social_signal_score(social_score: int | None, possible_inorganic_growth: bool) -> float:
+    """Pass-through of SocialScore.score (already 0-100 from M16), with
+    one adjustment: a flagged inorganic-growth token gets its social
+    contribution HALVED, not zeroed -- the flag means 'be skeptical of
+    this number,' not 'this token has zero social value.' Zeroing it
+    entirely would be an overcorrection for a heuristic that itself
+    admits uncertainty (see member_growth_signal's docstring in M16).
+
+    None (never scanned, or no Telegram link at all -- the two cases
+    are indistinguishable from the ranking engine's view, same as
+    contract_safety_score's None handling in M14) returns 50, neutral.
+    """
+    if social_score is None:
+        return 50.0
+    if possible_inorganic_growth:
+        return social_score * 0.5
+    return float(social_score)

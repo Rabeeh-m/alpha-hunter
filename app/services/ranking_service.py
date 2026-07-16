@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from app.core.logging import get_logger
 from app.models.token import Token
+from app.repositories.social_score_repository import SocialScoreRepository
 from app.ranking.scoring import (
     ScoreBreakdown,
     age_score,
@@ -12,6 +13,7 @@ from app.ranking.scoring import (
     liquidity_growth_score,
     liquidity_score,
     market_cap_score,
+    social_signal_score,
     volume_score,
 )
 from app.repositories.contract_security_repository import ContractSecurityRepository
@@ -29,11 +31,13 @@ class RankingService:
         snapshot_repository: TokenSnapshotRepository,
         alpha_score_repository: AlphaScoreRepository,
         contract_security_repository: ContractSecurityRepository,
+        social_score_repository: SocialScoreRepository,
     ) -> None:
         self._token_repo = token_repository
         self._snapshot_repo = snapshot_repository
         self._alpha_score_repo = alpha_score_repository
         self._contract_security_repo = contract_security_repository
+        self._social_score_repo = social_score_repository
 
     async def compute_for_token(self, token: Token) -> Decimal:
         since = datetime.now(UTC) - timedelta(hours=24)
@@ -43,6 +47,10 @@ class RankingService:
         security = await self._contract_security_repo.get_by_token_id(token.id)
         safety_score = security.safety_score if security is not None else None
 
+        social = await self._social_score_repo.get_by_token_id(token.id)
+        social_score_value = social.score if social is not None else None
+        inorganic_flag = social.possible_inorganic_growth if social is not None else False
+
         breakdown = ScoreBreakdown(
             liquidity=liquidity_score(token.liquidity_usd),
             volume=volume_score(token.volume_24h_usd),
@@ -50,6 +58,7 @@ class RankingService:
             age=age_score(token.created_at, datetime.now(UTC)),
             liquidity_growth=liquidity_growth_score(earliest_liquidity, token.liquidity_usd),
             contract_safety=contract_safety_score(safety_score),
+            social_signal=social_signal_score(social_score_value, inorganic_flag),
         )
 
         score = Decimal(str(breakdown.composite))

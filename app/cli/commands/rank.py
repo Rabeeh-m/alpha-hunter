@@ -11,6 +11,7 @@ from app.repositories.token_repository import TokenRepository
 from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.services.ranking_service import RankingService
 from app.repositories.contract_security_repository import ContractSecurityRepository
+from app.repositories.social_score_repository import SocialScoreRepository
 
 
 def rank() -> None:
@@ -25,7 +26,10 @@ async def _run() -> None:
         snapshot_repo = TokenSnapshotRepository(session)
         alpha_repo = AlphaScoreRepository(session)
         contract_security_repo = ContractSecurityRepository(session)
-        service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo)
+        social_score_repo = SocialScoreRepository(session)
+        service = RankingService(
+            token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_score_repo
+        )
         count = await service.compute_all()
         await session.commit()
 
