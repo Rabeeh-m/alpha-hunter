@@ -9,6 +9,8 @@ from app.cli.commands import rank as rank_commands
 from app.cli.commands import wallets as wallets_commands
 from app.cli.commands import security as security_commands
 from app.cli.commands import whales as whales_commands
+from app.cli.commands import social as social_commands
+
 
 app = typer.Typer(
     name="alpha-hunter",
@@ -23,6 +25,7 @@ app.command(name="rank")(rank_commands.rank)
 app.add_typer(wallets_commands.wallets_app, name="wallets")
 app.add_typer(security_commands.security_app, name="security")
 app.add_typer(whales_commands.whales_app, name="whales")
+app.add_typer(social_commands.social_app, name="social")
 
 if __name__ == "__main__":
     app()

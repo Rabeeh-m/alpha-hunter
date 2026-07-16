@@ -35,3 +35,14 @@ class DexScreenerPair(BaseModel):
     pair_created_at: int | None = Field(default=None, alias="pairCreatedAt")
 
     model_config = {"populate_by_name": True}
+
+
+class DexScreenerLink(BaseModel):
+    type: str | None = None
+    url: str | None = None
+
+
+class DexScreenerTokenProfile(BaseModel):
+    chain_id: str = Field(alias="chainId")
+    token_address: str = Field(alias="tokenAddress")
+    links: list[DexScreenerLink] = Field(default_factory=list)

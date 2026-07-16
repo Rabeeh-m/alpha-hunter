@@ -1,8 +1,16 @@
 from decimal import Decimal
 
 import pytest
+from sqlalchemy import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.pool import StaticPool
+
+
+@compiles(JSONB, "sqlite")
+def _compile_jsonb_sqlite(type_, compiler, **kw):
+    return compiler.process(JSON(), **kw)
 
 from app.core.database import Base
 from app.models.chain import Chain

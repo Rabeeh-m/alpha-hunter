@@ -5,7 +5,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.logging import get_logger
 from app.scheduler.execution import execute_job
-from app.scheduler.jobs import compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_whale_activity
+from app.scheduler.jobs import compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_whale_activity, scan_top_tokens_for_social_activity
 from app.scheduler.registry import JobDefinition, job_registry
 
 log = get_logger(__name__)
@@ -46,6 +46,14 @@ def register_jobs() -> None:
             category="whale-monitoring",
             func=scan_top_tokens_for_whale_activity,
             interval_seconds=1200,  # 20min -- balances rate-limit exposure against monitoring freshness
+        ),
+        JobDefinition(
+            id="scan_top_tokens_for_social_activity",
+            name="Social Activity Scan (Top 10 Tokens)",
+            description="Scan top-ranked tokens' Telegram channels -- bounded scope, Twitter/X excluded (see docs)",
+            category="social",
+            func=scan_top_tokens_for_social_activity,
+            interval_seconds=3600,  # 1h -- lower frequency than whale monitoring; scraping is heavier/slower per-call
         ),
     ]
 

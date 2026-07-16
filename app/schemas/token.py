@@ -30,6 +30,8 @@ class TokenCreate(BaseModel):
     volume_24h_usd: Decimal | None = None
     price_usd: Decimal | None = None
     pair_created_at: datetime | None = None
+    telegram_url: str | None = None
+    twitter_handle: str | None = None
 
 class TokenRead(BaseModel):
     id: UUID
@@ -47,6 +49,8 @@ class TokenRead(BaseModel):
     holder_count: int | None
     created_at: datetime
     pair_created_at: datetime | None = None
+    telegram_url: str | None
+    twitter_handle: str | None
 
     model_config = {"from_attributes": True}
 

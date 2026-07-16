@@ -15,7 +15,12 @@ from app.repositories.wallet_holding_repository import WalletHoldingRepository
 from app.repositories.wallet_repository import WalletRepository
 from app.repositories.whale_event_repository import WhaleEventRepository
 from app.services.wallet_discovery_service import WalletDiscoveryService
+from app.collectors.telegram_client import TelegramClient
+from app.repositories.social_score_repository import SocialScoreRepository
+from app.repositories.social_snapshot_repository import SocialSnapshotRepository
+from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
 
+TOP_N_TOKENS_FOR_SOCIAL_MONITORING = 10
 TOP_N_TOKENS_FOR_WHALE_MONITORING = 10  # bounded scope -- see milestone note on rate limits
 
 async def refresh_dexscreener() -> dict[str, int]:
@@ -88,3 +93,34 @@ async def scan_top_tokens_for_whale_activity() -> dict[str, int]:
         await client.close()
 
     return {"tokens_scanned": scanned}
+
+
+async def scan_top_tokens_for_social_activity() -> dict[str, int]:
+    """Same bounded-top-10 compromise as M15's whale monitoring, applied
+    here for consistency even though scraping has no formal rate limit
+    to protect -- unbounded scanning of every token's Telegram channel
+    every interval is still needlessly heavy traffic against a page not
+    designed to serve that."""
+    client = TelegramClient()
+    scanned, skipped = 0, 0
+    try:
+        async with async_session_factory() as session:
+            token_repo = TokenRepository(session)
+            tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_SOCIAL_MONITORING)
+
+            snapshot_repo = SocialSnapshotRepository(session)
+            score_repo = SocialScoreRepository(session)
+            service = SocialIntelligenceService(client, snapshot_repo, score_repo)
+
+            for token in tokens:
+                try:
+                    await service.scan_token(token)
+                    scanned += 1
+                except NoTelegramLinkAvailable:
+                    skipped += 1
+
+            await session.commit()
+    finally:
+        await client.close()
+
+    return {"tokens_scanned": scanned, "tokens_skipped_no_link": skipped}
