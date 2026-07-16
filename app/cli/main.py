@@ -10,7 +10,7 @@ from app.cli.commands import wallets as wallets_commands
 from app.cli.commands import security as security_commands
 from app.cli.commands import whales as whales_commands
 from app.cli.commands import social as social_commands
-
+from app.cli.commands import narratives as narrative_commands
 
 app = typer.Typer(
     name="alpha-hunter",
@@ -26,6 +26,7 @@ app.add_typer(wallets_commands.wallets_app, name="wallets")
 app.add_typer(security_commands.security_app, name="security")
 app.add_typer(whales_commands.whales_app, name="whales")
 app.add_typer(social_commands.social_app, name="social")
+app.add_typer(narrative_commands.narratives_app, name="narrative")
 
 if __name__ == "__main__":
     app()

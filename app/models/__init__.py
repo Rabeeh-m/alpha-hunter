@@ -9,9 +9,10 @@ from app.models.contract_security import ContractSecurity
 from app.models.whale_event import WhaleEvent, WhaleEventType
 from app.models.social_score import SocialScore
 from app.models.social_snapshot import TokenSocialSnapshot
+from app.models.narrative_classification import Narrative, NarrativeClassification
 
 __all__ = [
     "AlphaScore", "Chain", "JobRun", "JobStatus", "Token",
     "TokenSnapshot", "Wallet", "WalletHolding", "WalletType", "ContractSecurity", "WhaleEvent", "WhaleEventType",
-    "SocialScore", "TokenSocialSnapshot"
+    "SocialScore", "TokenSocialSnapshot", "Narrative", "NarrativeClassification"
 ]

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ScanLine, Wallet, Settings, Activity } from "lucide-react";
+import { LayoutDashboard, ScanLine, Wallet, Settings, Activity, Tags } from "lucide-react";
 import { useUiStore } from "../store/uiStore";
 import clsx from "clsx";
 
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: "/wallets", label: "Wallets", icon: Wallet },
   { to: "/system", label: "System", icon: Activity },
   { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/narratives", label: "Narratives", icon: Tags },
 ];
 
 export function Sidebar() {

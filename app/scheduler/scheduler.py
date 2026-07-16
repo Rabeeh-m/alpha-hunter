@@ -5,7 +5,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.logging import get_logger
 from app.scheduler.execution import execute_job
-from app.scheduler.jobs import compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_whale_activity, scan_top_tokens_for_social_activity
+from app.scheduler.jobs import compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_whale_activity, scan_top_tokens_for_social_activity, classify_unclassified_narratives
 from app.scheduler.registry import JobDefinition, job_registry
 
 log = get_logger(__name__)
@@ -54,6 +54,15 @@ def register_jobs() -> None:
             category="social",
             func=scan_top_tokens_for_social_activity,
             interval_seconds=3600,  # 1h -- lower frequency than whale monitoring; scraping is heavier/slower per-call
+        ),
+        JobDefinition(
+            id="classify_unclassified_narratives",
+            name="Narrative Classification Batch",
+            description="Classify up to 20 never-classified tokens per run (LLM cost-bounded)",
+            category="narrative",
+            func=classify_unclassified_narratives,
+            interval_seconds=600,  # 10min -- frequent enough to clear backlog steadily,
+                                     # bounded batch size keeps per-run LLM cost predictable
         ),
     ]
 

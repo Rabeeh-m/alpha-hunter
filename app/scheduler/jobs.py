@@ -20,7 +20,11 @@ from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository
 from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
 from app.repositories.social_score_repository import SocialScoreRepository
+from app.collectors.anthropic_client import AnthropicClassifierClient
+from app.repositories.narrative_repository import NarrativeRepository
+from app.services.narrative_classification_service import NarrativeClassificationService
 
+NARRATIVE_CLASSIFICATION_BATCH_SIZE = 20
 TOP_N_TOKENS_FOR_SOCIAL_MONITORING = 10
 TOP_N_TOKENS_FOR_WHALE_MONITORING = 10  # bounded scope -- see milestone note on rate limits
 
@@ -128,3 +132,16 @@ async def scan_top_tokens_for_social_activity() -> dict[str, int]:
         await client.close()
 
     return {"tokens_scanned": scanned, "tokens_skipped_no_link": skipped}
+
+
+async def classify_unclassified_narratives() -> dict[str, int]:
+    """Bounded per-run batch, not top-N-rescan -- see the model/service
+    docstrings for why this job's shape differs from every other
+    scheduled scan in this codebase."""
+    async with async_session_factory() as session:
+        client = AnthropicClassifierClient()
+        repo = NarrativeRepository(session)
+        service = NarrativeClassificationService(client, repo)
+        result = await service.classify_unclassified_batch(limit=NARRATIVE_CLASSIFICATION_BATCH_SIZE)
+        await session.commit()
+        return result

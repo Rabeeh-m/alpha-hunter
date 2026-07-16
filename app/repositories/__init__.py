@@ -8,11 +8,11 @@ from app.repositories.contract_security_repository import ContractSecurityReposi
 from app.repositories.whale_event_repository import WhaleEvent, WhaleEventRepository
 from app.repositories.social_score_repository import SocialScore, SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository, TokenSocialSnapshot
-
+from app.repositories.narrative_repository import NarrativeRepository
 
 __all__ = [
     "AlphaScoreRepository", "BaseRepository", "TokenRepository",
     "TokenSnapshotRepository", "WalletHoldingRepository", "WalletRepository", "ContractSecurityRepository", 
     "WhaleEvent", "WhaleEventRepository", "SocialScore", "SocialScoreRepository",
-    "SocialSnapshotRepository", "TokenSocialSnapshot"
+    "SocialSnapshotRepository", "TokenSocialSnapshot", "NarrativeRepository"
 ]
