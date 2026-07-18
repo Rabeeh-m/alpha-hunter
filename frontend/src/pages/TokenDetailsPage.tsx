@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { WhalesTab } from "../features/token-details/WhalesTab";
 import { ContractTab } from "../features/token-details/ContractTab";
 import { NarrativesTab } from "../features/token-details/NarrativesTab";
+import { DeveloperTab } from "../features/token-details/DeveloperTab";
 
 
 const LIVE_TABS = ["Overview", "Charts", "Whales", "Contract"] as const;
@@ -59,6 +60,7 @@ export function TokenDetailsPage() {
           {activeTab === "Whales" && <WhalesTab tokenId={token.id} />}
           {activeTab === "Contract" && <ContractTab tokenId={token.id} />}
           {activeTab === "narrative" && <NarrativesTab tokenId={token.id} />}
+          {activeTab === "developer" && <DeveloperTab tokenId={token.id} />}
 
           {!LIVE_TABS.includes(activeTab as (typeof LIVE_TABS)[number]) && (
             <div className="py-16 text-center text-sm text-text-muted">

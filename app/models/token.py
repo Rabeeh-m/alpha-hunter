@@ -50,5 +50,7 @@ class Token(Base, TimestampMixin):
     alpha_score: Mapped[AlphaScore | None] = relationship(back_populates="token", uselist=False, lazy="selectin")
     telegram_url: Mapped[str | None] = mapped_column(String(256), nullable=True)
     twitter_handle: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    github_url: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    
     def __repr__(self) -> str:
         return f"<Token {self.symbol} ({self.chain}:{self.contract_address[:10]}...)>"

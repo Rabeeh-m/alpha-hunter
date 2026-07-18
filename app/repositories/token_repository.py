@@ -53,6 +53,7 @@ class TokenRepository(BaseRepository[Token]):
         for field in (
             "pair_address", "dex", "liquidity_usd", "market_cap_usd",
             "fdv_usd", "volume_24h_usd", "price_usd", "telegram_url", "twitter_handle",
+            "github_url"
         ):
             setattr(existing, field, getattr(data, field))
         await self.session.flush()

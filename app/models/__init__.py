@@ -10,9 +10,11 @@ from app.models.whale_event import WhaleEvent, WhaleEventType
 from app.models.social_score import SocialScore
 from app.models.social_snapshot import TokenSocialSnapshot
 from app.models.narrative_classification import Narrative, NarrativeClassification
+from app.models.developer_activity import DeveloperActivity
+
 
 __all__ = [
     "AlphaScore", "Chain", "JobRun", "JobStatus", "Token",
     "TokenSnapshot", "Wallet", "WalletHolding", "WalletType", "ContractSecurity", "WhaleEvent", "WhaleEventType",
-    "SocialScore", "TokenSocialSnapshot", "Narrative", "NarrativeClassification"
+    "SocialScore", "TokenSocialSnapshot", "Narrative", "NarrativeClassification", "DeveloperActivity"
 ]

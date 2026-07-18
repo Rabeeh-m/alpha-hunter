@@ -26,6 +26,7 @@ class DexScreenerProvider:
                     continue
                 token.telegram_url = links_by_type.get("telegram")
                 token.twitter_handle = links_by_type.get("twitter")
+                token.github_url = links_by_type.get("github")
                 tokens.append(token)
         log.info("dexscreener_provider_fetched", count=len(tokens))
         return tokens

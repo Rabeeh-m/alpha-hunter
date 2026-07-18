@@ -32,6 +32,7 @@ class TokenCreate(BaseModel):
     pair_created_at: datetime | None = None
     telegram_url: str | None = None
     twitter_handle: str | None = None
+    github_url: str | None = None
 
 class TokenRead(BaseModel):
     id: UUID
@@ -51,6 +52,7 @@ class TokenRead(BaseModel):
     pair_created_at: datetime | None = None
     telegram_url: str | None
     twitter_handle: str | None
+    github_url: str | None = None
 
     model_config = {"from_attributes": True}
 

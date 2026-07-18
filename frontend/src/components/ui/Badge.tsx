@@ -8,6 +8,9 @@ const variants = {
   info: "bg-brand-info-light text-brand-info border-brand-info/20",
   neutral: "bg-bg-elevated text-text-secondary border-border",
   primary: "bg-brand-primary-light text-brand-primary border-brand-primary/20",
+  signal: "bg-brand-warning-light text-brand-warning border-brand-warning/20",
+  gain: "bg-brand-success-light text-brand-success border-brand-success/20",
+  loss: "bg-brand-danger-light text-brand-danger border-brand-danger/20",
 };
 
 export function Badge({

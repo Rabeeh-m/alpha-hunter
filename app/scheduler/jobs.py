@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from app.collectors.dexscreener_provider import DexScreenerProvider
 from app.collectors.geckoterminal_provider import GeckoTerminalProvider
+from app.collectors.github_client import GitHubClient
 from app.core.database.session import async_session_factory
+from app.repositories.developer_activity_repository import DeveloperActivityRepository
 from app.repositories.token_repository import TokenRepository
+from app.services.developer_intelligence_service import DeveloperIntelligenceService, NoRepoLinkAvailable, RepoNotFound
 from app.services.token_ingestion_service import TokenIngestionService
 from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.repositories.alpha_score_repository import AlphaScoreRepository
@@ -27,6 +30,7 @@ from app.services.narrative_classification_service import NarrativeClassificatio
 NARRATIVE_CLASSIFICATION_BATCH_SIZE = 20
 TOP_N_TOKENS_FOR_SOCIAL_MONITORING = 10
 TOP_N_TOKENS_FOR_WHALE_MONITORING = 10  # bounded scope -- see milestone note on rate limits
+TOP_N_TOKENS_FOR_DEVELOPER_MONITORING = 10
 
 async def refresh_dexscreener() -> dict[str, int]:
     provider = DexScreenerProvider()
@@ -145,3 +149,24 @@ async def classify_unclassified_narratives() -> dict[str, int]:
         result = await service.classify_unclassified_batch(limit=NARRATIVE_CLASSIFICATION_BATCH_SIZE)
         await session.commit()
         return result
+    
+    
+    async def scan_top_tokens_for_developer_activity() -> dict[str, int]:
+        client = GitHubClient()
+        scanned, skipped = 0, 0
+        try:
+            async with async_session_factory() as session:
+                token_repo = TokenRepository(session)
+                tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_DEVELOPER_MONITORING)
+                repo = DeveloperActivityRepository(session)
+                service = DeveloperIntelligenceService(client, repo)
+                for token in tokens:
+                    try:
+                        await service.scan_token(token)
+                        scanned += 1
+                    except (NoRepoLinkAvailable, RepoNotFound):
+                        skipped += 1
+                await session.commit()
+        finally:
+            await client.close()
+        return {"tokens_scanned": scanned, "tokens_skipped": skipped}

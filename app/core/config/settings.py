@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment == Environment.PRODUCTION
 
+    github_token: SecretStr | None = None
 
 @lru_cache
 def get_settings() -> Settings:
