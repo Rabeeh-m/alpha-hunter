@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import math
-from datetime import UTC, datetime
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from decimal import Decimal
 
 # Weights sum to 1.0. Liquidity and liquidity-growth are weighted highest
@@ -30,7 +30,9 @@ def _log_scale_score(value: Decimal | float | None, floor: float, ceiling: float
     is meaningful signal; the difference between $5M and $6M isn't."""
     if value is None or value <= 0:
         return 0.0
-    normalized = (math.log10(float(value)) - math.log10(floor)) / (math.log10(ceiling) - math.log10(floor))
+    normalized = (math.log10(float(value)) - math.log10(floor)) / (
+        math.log10(ceiling) - math.log10(floor)
+    )
     return max(0.0, min(100.0, normalized * 100))
 
 
@@ -103,8 +105,8 @@ class ScoreBreakdown:
         }
         result["composite"] = self.composite
         return result
-    
-    
+
+
 def contract_safety_score(safety_score: int | None) -> float:
     """Directly uses ContractSecurity.safety_score (already 0-100, from
     M13's compute_contract_risk) -- no further transformation needed,

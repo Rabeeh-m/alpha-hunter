@@ -13,11 +13,15 @@ class AlphaScoreRepository(BaseRepository[AlphaScore]):
     model = AlphaScore
 
     async def upsert(self, token_id: UUID, score: Decimal, factor_breakdown: dict) -> AlphaScore:
-        result = await self.session.execute(select(AlphaScore).where(AlphaScore.token_id == token_id))
+        result = await self.session.execute(
+            select(AlphaScore).where(AlphaScore.token_id == token_id)
+        )
         existing = result.scalar_one_or_none()
 
         if existing is None:
-            alpha_score = AlphaScore(token_id=token_id, score=score, factor_breakdown=factor_breakdown)
+            alpha_score = AlphaScore(
+                token_id=token_id, score=score, factor_breakdown=factor_breakdown
+            )
             return await self.add(alpha_score)
 
         existing.score = score

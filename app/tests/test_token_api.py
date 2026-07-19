@@ -26,8 +26,8 @@ async def test_search_filters_by_chain(db_session, seeded_tokens):
 async def test_search_sorts_with_nulls_last(db_session, seeded_tokens):
     repo = TokenRepository(db_session)
     results, _ = await repo.search(sort="-liquidity_usd")
-    assert results[0].symbol == "ALPHA"   # highest liquidity, first
-    assert results[-1].symbol == "BETA"   # NULL liquidity, always last
+    assert results[0].symbol == "ALPHA"  # highest liquidity, first
+    assert results[-1].symbol == "BETA"  # NULL liquidity, always last
 
 
 async def test_search_raises_on_unknown_sort_field(db_session, seeded_tokens):

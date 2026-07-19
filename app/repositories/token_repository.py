@@ -31,6 +31,7 @@ SORTABLE_FIELDS: dict[str, ColumnElement] = {
     "alpha_score": AlphaScore.score,
 }
 
+
 class TokenRepository(BaseRepository[Token]):
     model = Token
 
@@ -51,9 +52,16 @@ class TokenRepository(BaseRepository[Token]):
             return await self.add(token)
 
         for field in (
-            "pair_address", "dex", "liquidity_usd", "market_cap_usd",
-            "fdv_usd", "volume_24h_usd", "price_usd", "telegram_url", "twitter_handle",
-            "github_url"
+            "pair_address",
+            "dex",
+            "liquidity_usd",
+            "market_cap_usd",
+            "fdv_usd",
+            "volume_24h_usd",
+            "price_usd",
+            "telegram_url",
+            "twitter_handle",
+            "github_url",
         ):
             setattr(existing, field, getattr(data, field))
         await self.session.flush()
@@ -109,7 +117,11 @@ class TokenRepository(BaseRepository[Token]):
             conditions.append(Token.pair_created_at >= cutoff)
 
         base_query = select(Token).outerjoin(AlphaScore, Token.id == AlphaScore.token_id)
-        count_query = select(func.count()).select_from(Token).outerjoin(AlphaScore, Token.id == AlphaScore.token_id)
+        count_query = (
+            select(func.count())
+            .select_from(Token)
+            .outerjoin(AlphaScore, Token.id == AlphaScore.token_id)
+        )
         for condition in conditions:
             base_query = base_query.where(condition)
             count_query = count_query.where(condition)
@@ -117,9 +129,7 @@ class TokenRepository(BaseRepository[Token]):
         total = (await self.session.execute(count_query)).scalar_one()
 
         paged_query = (
-            base_query.order_by(order_clause)
-            .limit(page_size)
-            .offset((page - 1) * page_size)
+            base_query.order_by(order_clause).limit(page_size).offset((page - 1) * page_size)
         )
         tokens = list((await self.session.execute(paged_query)).scalars().all())
 

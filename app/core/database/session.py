@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from app.core.config import get_settings
 
@@ -51,10 +56,11 @@ def get_async_session_factory():
 
 
 # Backward compatible aliases for existing imports
-# These allow existing code that does ``from app.core.database.session import async_session_factory``
-# to continue working without modification. ``async_session_factory`` is a callable that
+# These let existing ``from app.core.database.session import async_session_factory``
+# continue working. ``async_session_factory`` is a callable that
 # returns the lazily‑initialised sessionmaker, matching the previous API.
 # Backward‑compatible callable aliases
+
 
 def engine() -> AsyncEngine:
     """Return the lazily‑created async engine.
@@ -63,6 +69,7 @@ def engine() -> AsyncEngine:
     instantiated only after an event loop is running.
     """
     return get_engine()
+
 
 # Backward‑compatible alias for the async sessionmaker
 async_session_factory = get_async_session_factory()

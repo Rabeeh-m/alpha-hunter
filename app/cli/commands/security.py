@@ -10,7 +10,10 @@ from app.core.database.session import async_session_factory
 from app.core.logging import configure_logging
 from app.repositories.contract_security_repository import ContractSecurityRepository
 from app.repositories.token_repository import TokenRepository
-from app.services.contract_security_service import ContractSecurityService, UnsupportedChainForSecurityScan
+from app.services.contract_security_service import (
+    ContractSecurityService,
+    UnsupportedChainForSecurityScan,
+)
 
 security_app = typer.Typer(help="On-demand contract security scanning.")
 

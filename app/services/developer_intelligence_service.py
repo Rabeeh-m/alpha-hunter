@@ -29,7 +29,10 @@ class DeveloperIntelligenceService:
 
     async def scan_token(self, token: Token) -> int:
         if not token.github_url:
-            raise NoRepoLinkAvailable(f"Token '{token.symbol}' has no known GitHub link", details={"token_id": str(token.id)})
+            raise NoRepoLinkAvailable(
+                f"Token '{token.symbol}' has no known GitHub link",
+                details={"token_id": str(token.id)},
+            )
 
         parsed = extract_owner_repo(token.github_url)
         if parsed is None:
@@ -46,5 +49,10 @@ class DeveloperIntelligenceService:
         result = compute_developer_activity(repo, contributor_count, release_count)
         await self._repository.upsert(token.id, result)
 
-        log.info("developer_activity_scan_complete", token_id=str(token.id), symbol=token.symbol, score=result.score)
+        log.info(
+            "developer_activity_scan_complete",
+            token_id=str(token.id),
+            symbol=token.symbol,
+            score=result.score,
+        )
         return result.score

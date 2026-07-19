@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -10,9 +10,7 @@ from app.contracts.risk_scoring import ContractRiskResult
 from app.core.exceptions import InvalidSortField
 from app.developer.scoring import DeveloperActivityResult
 from app.models.chain import Chain
-from app.models.contract_security import ContractSecurity
-from app.models.developer_activity import DeveloperActivity
-from app.models.narrative_classification import Narrative, NarrativeClassification
+from app.models.narrative_classification import Narrative
 from app.models.token import Token
 from app.models.wallet import Wallet, WalletType
 from app.models.whale_event import WhaleEvent, WhaleEventType
@@ -24,9 +22,9 @@ from app.repositories.wallet_repository import WalletRepository
 from app.repositories.whale_event_repository import WhaleEventRepository
 from app.schemas.token import TokenCreate
 
-
 # ── contract_security_repository ──────────────────────────────────────
 # uncovered: lines 30-33 (upsert-existing branch)
+
 
 async def test_contract_security_upsert_updates_existing(db_session: AsyncSession):
     token = Token(chain=Chain.BASE, contract_address="0xsec", name="Sec", symbol="SEC")
@@ -59,6 +57,7 @@ async def test_contract_security_upsert_creates_new(db_session: AsyncSession):
 # ── developer_activity_repository ─────────────────────────────────────
 # uncovered: lines 27-30 (upsert-existing branch)
 
+
 async def test_dev_activity_upsert_updates_existing(db_session: AsyncSession):
     token = Token(chain=Chain.BASE, contract_address="0xdev", name="Dev", symbol="DEV")
     db_session.add(token)
@@ -79,9 +78,16 @@ async def test_dev_activity_upsert_updates_existing(db_session: AsyncSession):
 # ── narrative_repository ──────────────────────────────────────────────
 # uncovered: lines 27-31 (upsert-existing branch), line 56 (distribution)
 
-async def test_narrative_list_unclassified_returns_tokens_without_classification(db_session: AsyncSession):
-    classified = Token(chain=Chain.BASE, contract_address="0xclassified", name="Classified", symbol="C")
-    unclassified = Token(chain=Chain.BASE, contract_address="0xunclassified", name="Unclassified", symbol="U")
+
+async def test_narrative_list_unclassified_returns_tokens_without_classification(
+    db_session: AsyncSession,
+):
+    classified = Token(
+        chain=Chain.BASE, contract_address="0xclassified", name="Classified", symbol="C"
+    )
+    unclassified = Token(
+        chain=Chain.BASE, contract_address="0xunclassified", name="Unclassified", symbol="U"
+    )
     db_session.add_all([classified, unclassified])
     await db_session.flush()
 
@@ -94,8 +100,10 @@ async def test_narrative_list_unclassified_returns_tokens_without_classification
 
 
 async def test_narrative_list_unclassified_respects_limit(db_session: AsyncSession):
-    tokens = [Token(chain=Chain.BASE, contract_address=f"0xul{i}", name=f"UL{i}", symbol=f"UL{i}")
-              for i in range(5)]
+    tokens = [
+        Token(chain=Chain.BASE, contract_address=f"0xul{i}", name=f"UL{i}", symbol=f"UL{i}")
+        for i in range(5)
+    ]
     db_session.add_all(tokens)
     await db_session.flush()
 
@@ -144,18 +152,27 @@ async def test_narrative_distribution_returns_empty_dict(db_session: AsyncSessio
 # ── token_repository ──────────────────────────────────────────────────
 # uncovered: lines 48-60 (upsert-existing branch), 106, 108-109 (search conditions)
 
+
 async def test_token_upsert_updates_mutable_fields(db_session: AsyncSession):
     repo = TokenRepository(db_session)
     data = TokenCreate(
-        chain=Chain.BASE, contract_address="0xtup", name="Original", symbol="ORG",
-        liquidity_usd=Decimal("50000"), dex="uniswap",
+        chain=Chain.BASE,
+        contract_address="0xtup",
+        name="Original",
+        symbol="ORG",
+        liquidity_usd=Decimal("50000"),
+        dex="uniswap",
     )
     first = await repo.upsert(data)
     assert first.liquidity_usd == Decimal("50000")
 
     update = TokenCreate(
-        chain=Chain.BASE, contract_address="0xtup", name="ShouldNotChange", symbol="SNC",
-        liquidity_usd=Decimal("75000"), dex="pancakeswap",
+        chain=Chain.BASE,
+        contract_address="0xtup",
+        name="ShouldNotChange",
+        symbol="SNC",
+        liquidity_usd=Decimal("75000"),
+        dex="pancakeswap",
     )
     second = await repo.upsert(update)
     assert second.id == first.id
@@ -166,8 +183,14 @@ async def test_token_upsert_updates_mutable_fields(db_session: AsyncSession):
 async def test_token_search_with_volume_filter(db_session: AsyncSession):
     repo = TokenRepository(db_session)
     tokens = [
-        Token(chain=Chain.BASE, contract_address=f"0xvol{i}", name=f"V{i}", symbol=f"V{i}",
-              volume_24h_usd=Decimal(str(v))) for i, v in enumerate([500, 1500, 2500])
+        Token(
+            chain=Chain.BASE,
+            contract_address=f"0xvol{i}",
+            name=f"V{i}",
+            symbol=f"V{i}",
+            volume_24h_usd=Decimal(str(v)),
+        )
+        for i, v in enumerate([500, 1500, 2500])
     ]
     db_session.add_all(tokens)
     await db_session.flush()
@@ -179,12 +202,24 @@ async def test_token_search_with_volume_filter(db_session: AsyncSession):
 
 async def test_token_search_with_pair_age_filter(db_session: AsyncSession):
     repo = TokenRepository(db_session)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     tokens = [
-        Token(chain=Chain.BASE, contract_address="0xage1", name="Age1", symbol="A1",
-              pair_created_at=now, volume_24h_usd=Decimal("1000")),
-        Token(chain=Chain.BASE, contract_address="0xage2", name="Age2", symbol="A2",
-              pair_created_at=now, volume_24h_usd=Decimal("1000")),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xage1",
+            name="Age1",
+            symbol="A1",
+            pair_created_at=now,
+            volume_24h_usd=Decimal("1000"),
+        ),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xage2",
+            name="Age2",
+            symbol="A2",
+            pair_created_at=now,
+            volume_24h_usd=Decimal("1000"),
+        ),
     ]
     db_session.add_all(tokens)
     await db_session.flush()
@@ -203,10 +238,20 @@ async def test_token_search_empty_result(db_session: AsyncSession):
 async def test_token_search_by_chain(db_session: AsyncSession):
     repo = TokenRepository(db_session)
     tokens = [
-        Token(chain=Chain.BASE, contract_address="0xbase1", name="Base Token", symbol="BASE",
-              volume_24h_usd=Decimal("1000")),
-        Token(chain=Chain.SOLANA, contract_address="0xsol1", name="Sol Token", symbol="SOL",
-              volume_24h_usd=Decimal("1000")),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xbase1",
+            name="Base Token",
+            symbol="BASE",
+            volume_24h_usd=Decimal("1000"),
+        ),
+        Token(
+            chain=Chain.SOLANA,
+            contract_address="0xsol1",
+            name="Sol Token",
+            symbol="SOL",
+            volume_24h_usd=Decimal("1000"),
+        ),
     ]
     db_session.add_all(tokens)
     await db_session.flush()
@@ -219,10 +264,22 @@ async def test_token_search_by_chain(db_session: AsyncSession):
 async def test_token_search_with_liquidity_filter(db_session: AsyncSession):
     repo = TokenRepository(db_session)
     tokens = [
-        Token(chain=Chain.BASE, contract_address="0xliq1", name="Liq1", symbol="L1",
-              liquidity_usd=Decimal("500"), volume_24h_usd=Decimal("100")),
-        Token(chain=Chain.BASE, contract_address="0xliq2", name="Liq2", symbol="L2",
-              liquidity_usd=Decimal("5000"), volume_24h_usd=Decimal("100")),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xliq1",
+            name="Liq1",
+            symbol="L1",
+            liquidity_usd=Decimal("500"),
+            volume_24h_usd=Decimal("100"),
+        ),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xliq2",
+            name="Liq2",
+            symbol="L2",
+            liquidity_usd=Decimal("5000"),
+            volume_24h_usd=Decimal("100"),
+        ),
     ]
     db_session.add_all(tokens)
     await db_session.flush()
@@ -240,6 +297,7 @@ async def test_token_search_raises_on_invalid_sort_field(db_session: AsyncSessio
 
 # ── wallet_repository ────────────────────────────────────────────────
 # uncovered: lines 27-28 (confidence upgrade branch)
+
 
 async def test_get_or_create_creates_new_wallet(db_session: AsyncSession):
     repo = WalletRepository(db_session)
@@ -272,9 +330,11 @@ async def test_get_or_create_does_not_downgrade_confidence(db_session: AsyncSess
     assert same.confidence_score == Decimal("90")
 
 
-async def test_get_or_create_with_none_confidence_does_not_change_existing(db_session: AsyncSession):
+async def test_get_or_create_with_none_confidence_does_not_change_existing(
+    db_session: AsyncSession,
+):
     repo = WalletRepository(db_session)
-    wallet = await repo.get_or_create(Chain.BASE, "0xnoneconf", WalletType.WHALE, Decimal("70"))
+    await repo.get_or_create(Chain.BASE, "0xnoneconf", WalletType.WHALE, Decimal("70"))
 
     same = await repo.get_or_create(Chain.BASE, "0xnoneconf", WalletType.EXCHANGE, None)
     assert same.wallet_type == WalletType.WHALE
@@ -284,6 +344,7 @@ async def test_get_or_create_with_none_confidence_does_not_change_existing(db_se
 # ── whale_event_repository ────────────────────────────────────────────
 # uncovered: line 18 (list_recent with empty result)
 
+
 async def test_list_recent_returns_empty_when_no_events(db_session: AsyncSession):
     repo = WhaleEventRepository(db_session)
     events = await repo.list_recent()
@@ -292,16 +353,29 @@ async def test_list_recent_returns_empty_when_no_events(db_session: AsyncSession
 
 async def test_list_recent_returns_events_ordered_by_detected_at(db_session: AsyncSession):
     token = Token(chain=Chain.BASE, contract_address="0xwhale", name="Whale", symbol="WHL")
-    wallet = Wallet(chain=Chain.BASE, address="0xwhale1", wallet_type=WalletType.WHALE, confidence_score=Decimal("80"))
+    wallet = Wallet(
+        chain=Chain.BASE,
+        address="0xwhale1",
+        wallet_type=WalletType.WHALE,
+        confidence_score=Decimal("80"),
+    )
     db_session.add_all([token, wallet])
     await db_session.flush()
 
     repo = WhaleEventRepository(db_session)
     events = [
-        WhaleEvent(token_id=token.id, wallet_id=wallet.id, event_type=WhaleEventType.NEW_POSITION,
-                   new_balance=Decimal("1000")),
-        WhaleEvent(token_id=token.id, wallet_id=wallet.id, event_type=WhaleEventType.INCREASED,
-                   new_balance=Decimal("2000")),
+        WhaleEvent(
+            token_id=token.id,
+            wallet_id=wallet.id,
+            event_type=WhaleEventType.NEW_POSITION,
+            new_balance=Decimal("1000"),
+        ),
+        WhaleEvent(
+            token_id=token.id,
+            wallet_id=wallet.id,
+            event_type=WhaleEventType.INCREASED,
+            new_balance=Decimal("2000"),
+        ),
     ]
     db_session.add_all(events)
     await db_session.flush()
@@ -313,15 +387,28 @@ async def test_list_recent_returns_events_ordered_by_detected_at(db_session: Asy
 async def test_list_for_token_returns_events_for_specific_token(db_session: AsyncSession):
     token_a = Token(chain=Chain.BASE, contract_address="0xwhaleA", name="WhaleA", symbol="WA")
     token_b = Token(chain=Chain.BASE, contract_address="0xwhaleB", name="WhaleB", symbol="WB")
-    wallet = Wallet(chain=Chain.BASE, address="0xwhale2", wallet_type=WalletType.WHALE, confidence_score=Decimal("80"))
+    wallet = Wallet(
+        chain=Chain.BASE,
+        address="0xwhale2",
+        wallet_type=WalletType.WHALE,
+        confidence_score=Decimal("80"),
+    )
     db_session.add_all([token_a, token_b, wallet])
     await db_session.flush()
 
     repo = WhaleEventRepository(db_session)
-    e1 = WhaleEvent(token_id=token_a.id, wallet_id=wallet.id, event_type=WhaleEventType.NEW_POSITION,
-                    new_balance=Decimal("500"))
-    e2 = WhaleEvent(token_id=token_b.id, wallet_id=wallet.id, event_type=WhaleEventType.INCREASED,
-                    new_balance=Decimal("1000"))
+    e1 = WhaleEvent(
+        token_id=token_a.id,
+        wallet_id=wallet.id,
+        event_type=WhaleEventType.NEW_POSITION,
+        new_balance=Decimal("500"),
+    )
+    e2 = WhaleEvent(
+        token_id=token_b.id,
+        wallet_id=wallet.id,
+        event_type=WhaleEventType.INCREASED,
+        new_balance=Decimal("1000"),
+    )
     db_session.add_all([e1, e2])
     await db_session.flush()
 

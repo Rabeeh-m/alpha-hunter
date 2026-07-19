@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from decimal import Decimal
-
 from app.contracts.risk_scoring import compute_contract_risk
 from app.schemas.goplus import GoPlusTokenSecurity
 
@@ -29,7 +27,9 @@ def test_honeypot_crashes_score_near_zero():
 
 
 def test_mintable_with_renounced_owner_not_penalized_as_hard():
-    result = compute_contract_risk(_security(is_mintable="1", owner_address="0x0000000000000000000000000000000000000000"))
+    result = compute_contract_risk(
+        _security(is_mintable="1", owner_address="0x0000000000000000000000000000000000000000")
+    )
     assert result.safety_score == 100  # renounced -- mintable alone isn't penalized
     assert result.is_mintable is True
 
@@ -52,9 +52,17 @@ def test_unverified_source_penalized():
 
 
 def test_score_never_goes_below_zero():
-    result = compute_contract_risk(_security(
-        is_honeypot="1", can_take_back_ownership="1", hidden_owner="1",
-        selfdestruct="1", transfer_pausable="1", is_blacklisted="1",
-        is_open_source="0", buy_tax="0.5", sell_tax="0.5",
-    ))
+    result = compute_contract_risk(
+        _security(
+            is_honeypot="1",
+            can_take_back_ownership="1",
+            hidden_owner="1",
+            selfdestruct="1",
+            transfer_pausable="1",
+            is_blacklisted="1",
+            is_open_source="0",
+            buy_tax="0.5",
+            sell_tax="0.5",
+        )
+    )
     assert result.safety_score == 0

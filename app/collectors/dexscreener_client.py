@@ -51,9 +51,7 @@ class DexScreenerClient:
         raw = await self._get(f"/latest/dex/tokens/{token_address}")
         pairs = raw.get("pairs") or []
         await cache_set(cache_key, pairs, ttl_seconds=60)
-        return [
-            DexScreenerPair.model_validate(p) for p in pairs if p.get("chainId") == chain_id
-        ]
+        return [DexScreenerPair.model_validate(p) for p in pairs if p.get("chainId") == chain_id]
 
     async def close(self) -> None:
         await self._client.aclose()

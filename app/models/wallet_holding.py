@@ -27,10 +27,16 @@ class WalletHolding(Base):
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     token_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("tokens.id", ondelete="CASCADE"), nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("tokens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     wallet_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("wallets.id", ondelete="CASCADE"), nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("wallets.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
 
     approximate_balance: Mapped[Decimal] = mapped_column(Numeric(36, 18), nullable=False)

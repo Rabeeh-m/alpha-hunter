@@ -13,7 +13,7 @@ other information -- no whitepaper, no website, no team info.
 Valid categories: {_NARRATIVE_LIST}
 
 Respond with ONLY a JSON object, no markdown fences, no other text:
-{{"primary_narrative": "<one of the categories above>", "confidence": <integer 0-100>, "reasoning": "<under 15 words>"}}
+{{"primary_narrative": "<category>", "confidence": <0-100>, "reasoning": "<under 15 words>"}}
 
 Use "other" when the name/symbol gives no clear signal, or when it could
 plausibly be several categories at once. Do not guess confidently from

@@ -11,18 +11,24 @@ from app.repositories.developer_activity_repository import DeveloperActivityRepo
 from app.repositories.token_repository import TokenRepository
 from app.schemas.developer import DeveloperActivityRead
 from app.services.developer_intelligence_service import (
-    DeveloperIntelligenceService, NoRepoLinkAvailable, RepoNotFound,
+    DeveloperIntelligenceService,
+    NoRepoLinkAvailable,
+    RepoNotFound,
 )
 
 router = APIRouter(prefix="/tokens/{token_id}/developer", tags=["developer"])
 
 
 @router.get("", response_model=DeveloperActivityRead)
-async def get_token_developer_activity(token_id: UUID, db: AsyncSession = Depends(get_db)) -> DeveloperActivityRead:
+async def get_token_developer_activity(
+    token_id: UUID, db: AsyncSession = Depends(get_db)
+) -> DeveloperActivityRead:
     repo = DeveloperActivityRepository(db)
     record = await repo.get_by_token_id(token_id)
     if record is None:
-        raise HTTPException(status_code=404, detail="No scan yet -- call POST .../developer/scan first")
+        raise HTTPException(
+            status_code=404, detail="No scan yet -- call POST .../developer/scan first"
+        )
     return DeveloperActivityRead.model_validate(record)
 
 

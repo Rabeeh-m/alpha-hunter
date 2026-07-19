@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock, patch
+
 import httpx
 import pytest
 import respx
@@ -98,7 +99,7 @@ async def test_client_retries_and_backs_off_on_429(mock_sleep, http_client):
     route.side_effect = [
         httpx.Response(429, json={"error": "Too Many Requests"}),
         httpx.Response(429, json={"error": "Too Many Requests"}),
-        httpx.Response(200, json={"data": [MOCK_POOL]})
+        httpx.Response(200, json={"data": [MOCK_POOL]}),
     ]
 
     client = GeckoTerminalClient(http_client=http_client, rate_limit_interval=0.0)

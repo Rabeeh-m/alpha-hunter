@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
@@ -44,8 +44,12 @@ def test_jobs_run_unknown_job_exits_nonzero():
 def test_jobs_list_shows_last_run(mock_factory):
     job_registry._jobs.clear()
     test_job = JobDefinition(
-        id="test-ingest-job", name="Test Ingest", description="", category="test",
-        func=refresh_dexscreener, interval_seconds=60,
+        id="test-ingest-job",
+        name="Test Ingest",
+        description="",
+        category="test",
+        func=refresh_dexscreener,
+        interval_seconds=60,
     )
     job_registry.register(test_job)
 
@@ -55,7 +59,7 @@ def test_jobs_list_shows_last_run(mock_factory):
 
     fake_run = MagicMock(spec=["status", "started_at"])
     fake_run.status = MagicMock(value="success")
-    fake_run.started_at = datetime(2026, 7, 19, 12, 0, 0, tzinfo=timezone.utc)
+    fake_run.started_at = datetime(2026, 7, 19, 12, 0, 0, tzinfo=UTC)
 
     mock_result = MagicMock()
     mock_result.scalars.return_value.first.return_value = fake_run
@@ -75,8 +79,12 @@ def test_jobs_list_shows_last_run(mock_factory):
 def test_jobs_list_shows_never_run_when_no_job_run():
     job_registry._jobs.clear()
     test_job = JobDefinition(
-        id="test-never-run-job", name="Never Run", description="", category="test",
-        func=refresh_dexscreener, interval_seconds=60,
+        id="test-never-run-job",
+        name="Never Run",
+        description="",
+        category="test",
+        func=refresh_dexscreener,
+        interval_seconds=60,
     )
     job_registry.register(test_job)
 

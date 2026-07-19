@@ -5,17 +5,14 @@ Revises: be436e3727bb
 Create Date: 2026-07-13 17:12:58.823894
 
 """
-from typing import Sequence, Union
 
-from alembic import op
-import sqlalchemy as sa
-
+from collections.abc import Sequence
 
 # revision identifiers, used by Alembic.
-revision: str = 'def592c4ce88'
-down_revision: Union[str, Sequence[str], None] = 'be436e3727bb'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "def592c4ce88"
+down_revision: str | Sequence[str] | None = "be436e3727bb"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

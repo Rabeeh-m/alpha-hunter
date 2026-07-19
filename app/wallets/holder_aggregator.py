@@ -44,7 +44,9 @@ def aggregate_net_balances(transfers: list[EtherscanTransfer]) -> dict[str, Deci
     return {addr: bal for addr, bal in balances.items() if bal > 0}
 
 
-def rank_top_holders(balances: dict[str, Decimal], top_n: int = 20) -> list[tuple[str, Decimal, int]]:
+def rank_top_holders(
+    balances: dict[str, Decimal], top_n: int = 20
+) -> list[tuple[str, Decimal, int]]:
     """Returns (address, balance, rank) sorted descending, rank 1-indexed."""
     ranked = sorted(balances.items(), key=lambda item: item[1], reverse=True)[:top_n]
     return [(addr, bal, i + 1) for i, (addr, bal) in enumerate(ranked)]

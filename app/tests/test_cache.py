@@ -1,6 +1,9 @@
 import asyncio
+
 import pytest
+
 from app.core.cache import get_redis
+
 
 @pytest.mark.asyncio
 async def test_get_redis_same_loop_returns_same_instance():
@@ -31,6 +34,7 @@ def test_get_redis_different_loops_returns_different_instances():
 
     assert len(redis_instances) == 2
     assert redis_instances[0] is not redis_instances[1]
+
 
 def test_get_redis_no_running_loop():
     # Calling get_redis outside an async loop should not raise an error

@@ -39,7 +39,9 @@ async def _run(provider: str) -> None:
     if provider in ("geckoterminal", "all"):
         providers.append(geckoterminal)
     if not providers:
-        typer.secho(f"Unknown provider '{provider}'. Use dexscreener, geckoterminal, or all.", fg="red")
+        typer.secho(
+            f"Unknown provider '{provider}'. Use dexscreener, geckoterminal, or all.", fg="red"
+        )
         raise typer.Exit(code=1)
 
     try:

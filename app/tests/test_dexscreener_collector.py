@@ -155,9 +155,7 @@ async def test_constructor_creates_own_client_when_none(mock_client_cls):
 
     client = DexScreenerClient()
     assert client._client is mock_instance
-    mock_client_cls.assert_called_once_with(
-        base_url="https://api.dexscreener.com", timeout=10.0
-    )
+    mock_client_cls.assert_called_once_with(base_url="https://api.dexscreener.com", timeout=10.0)
 
 
 @respx.mock
@@ -177,7 +175,9 @@ async def test_client_retries_then_succeeds_after_transient_500(http_client):
             return httpx.Response(500)
         return httpx.Response(200, json={"pairs": [MOCK_PAIR]})
 
-    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xretrytest").mock(side_effect=_handler)
+    respx.get("https://api.dexscreener.com/latest/dex/tokens/0xretrytest").mock(
+        side_effect=_handler
+    )
 
     client = DexScreenerClient(http_client=http_client)
     pairs = await client.get_pairs_for_token("base", "0xretrytest")

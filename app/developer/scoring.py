@@ -6,14 +6,16 @@ from datetime import UTC, datetime
 
 WEIGHTS: dict[str, float] = {
     "popularity": 0.25,
-    "freshness": 0.35,   # highest weight -- "actively worked on right now" is
-    "contributors": 0.25, # more actionable for scam-detection than raw star count
+    "freshness": 0.35,  # highest weight -- "actively worked on right now" is
+    "contributors": 0.25,  # more actionable for scam-detection than raw star count
     "releases": 0.15,
 }
 
-FORK_PENALTY_MULTIPLIER = 0.5    # flat penalty, not zero -- a fork CAN still have
-                                    # real original work; the flag alone isn't proof of nothing
-ARCHIVED_PENALTY_MULTIPLIER = 0.3 # much harsher -- archived means development has definitively stopped
+FORK_PENALTY_MULTIPLIER = 0.5  # flat penalty, not zero -- a fork CAN still have
+# real original work; the flag alone isn't proof of nothing
+ARCHIVED_PENALTY_MULTIPLIER = (
+    0.3  # much harsher -- archived means development has definitively stopped
+)
 
 
 def repo_popularity_score(stars: int, forks: int) -> float:
@@ -94,7 +96,12 @@ def compute_developer_activity(
         flags.append("No significant developer-activity concerns detected")
 
     return DeveloperActivityResult(
-        score=round(max(0.0, min(100.0, raw_score))), flags=flags,
-        stars=repo.stargazers_count, forks=repo.forks_count, contributors_count=contributor_count,
-        last_commit_at=repo.pushed_at, is_fork=repo.fork, is_archived=repo.archived,
+        score=round(max(0.0, min(100.0, raw_score))),
+        flags=flags,
+        stars=repo.stargazers_count,
+        forks=repo.forks_count,
+        contributors_count=contributor_count,
+        last_commit_at=repo.pushed_at,
+        is_fork=repo.fork,
+        is_archived=repo.archived,
     )

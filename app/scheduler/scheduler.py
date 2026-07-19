@@ -5,7 +5,15 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.logging import get_logger
 from app.scheduler.execution import execute_job
-from app.scheduler.jobs import classify_unclassified_narratives, compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_developer_activity, scan_top_tokens_for_social_activity, scan_top_tokens_for_whale_activity
+from app.scheduler.jobs import (
+    classify_unclassified_narratives,
+    compute_alpha_scores,
+    refresh_dexscreener,
+    refresh_geckoterminal,
+    scan_top_tokens_for_developer_activity,
+    scan_top_tokens_for_social_activity,
+    scan_top_tokens_for_whale_activity,
+)
 from app.scheduler.registry import JobDefinition, job_registry
 
 log = get_logger(__name__)
@@ -37,23 +45,23 @@ def register_jobs() -> None:
             description="Recompute explainable alpha scores for all tokens",
             category="ranking",
             func=compute_alpha_scores,
-            interval_seconds=120,  
+            interval_seconds=120,
         ),
         JobDefinition(
             id="scan_top_tokens_for_whale_activity",
             name="Whale Activity Scan (Top 10 Tokens)",
-            description="Re-scan top-ranked tokens' holders to detect balance changes -- bounded scope, see docstring",
+            description="Re-scan top-ranked tokens' holders for balance changes -- see docstring",
             category="whale-monitoring",
             func=scan_top_tokens_for_whale_activity,
-            interval_seconds=1200,  # 20min -- balances rate-limit exposure against monitoring freshness
+            interval_seconds=1200,  # 20min -- rate-limit vs freshness trade-off
         ),
         JobDefinition(
             id="scan_top_tokens_for_social_activity",
             name="Social Activity Scan (Top 10 Tokens)",
-            description="Scan top-ranked tokens' Telegram channels -- bounded scope, Twitter/X excluded (see docs)",
+            description="Scan top-ranked tokens' Telegram channels (Twitter/X excluded)",
             category="social",
             func=scan_top_tokens_for_social_activity,
-            interval_seconds=3600,  # 1h -- lower frequency than whale monitoring; scraping is heavier/slower per-call
+            interval_seconds=3600,  # 1h -- slower than whale, scraping is heavy
         ),
         JobDefinition(
             id="classify_unclassified_narratives",
@@ -62,7 +70,7 @@ def register_jobs() -> None:
             category="narrative",
             func=classify_unclassified_narratives,
             interval_seconds=600,  # 10min -- frequent enough to clear backlog steadily,
-                                     # bounded batch size keeps per-run LLM cost predictable
+            # bounded batch size keeps per-run LLM cost predictable
         ),
         JobDefinition(
             id="scan_top_tokens_for_developer_activity",
@@ -85,6 +93,7 @@ def register_jobs() -> None:
                 max_instances=1,
                 replace_existing=True,
             )
+
 
 def start_scheduler() -> None:
     register_jobs()

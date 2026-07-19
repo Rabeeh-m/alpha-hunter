@@ -40,7 +40,11 @@ class NarrativeClassification(Base):
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     token_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("tokens.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("tokens.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+        index=True,
     )
 
     primary_narrative: Mapped[Narrative] = mapped_column(
@@ -54,4 +58,6 @@ class NarrativeClassification(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<NarrativeClassification token_id={self.token_id} narrative={self.primary_narrative}>"
+        return (
+            f"<NarrativeClassification token_id={self.token_id} narrative={self.primary_narrative}>"
+        )

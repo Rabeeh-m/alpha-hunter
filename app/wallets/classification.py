@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from app.models.wallet import WalletType
 
+
 # V2-M1 heuristic: ONLY rank-within-this-token informs the tag. This is
 # deliberately conservative -- it does NOT claim to detect real smart
 # money, VCs, or exchanges (those need cross-token pattern data or a

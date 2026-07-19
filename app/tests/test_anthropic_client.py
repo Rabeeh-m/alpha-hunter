@@ -10,9 +10,12 @@ from app.models.narrative_classification import Narrative
 
 @pytest.fixture(autouse=True)
 def mock_anthropic_sdk(monkeypatch):
-    monkeypatch.setattr("app.collectors.anthropic_client.get_settings", lambda: MagicMock(
-        anthropic_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
-    ))
+    monkeypatch.setattr(
+        "app.collectors.anthropic_client.get_settings",
+        lambda: MagicMock(
+            anthropic_api_key=MagicMock(get_secret_value=lambda: "sk-test"),
+        ),
+    )
 
 
 @pytest.fixture
@@ -27,7 +30,12 @@ def mock_messages_create():
 class TestAnthropicClassifierClient:
     async def test_classify_returns_parsed_result(self, mock_messages_create):
         mock_messages_create.create.return_value = MagicMock(
-            content=[MagicMock(type="text", text='{"primary_narrative": "meme", "confidence": 85, "reasoning": "Animal name in symbol"}')]
+            content=[
+                MagicMock(
+                    type="text",
+                    text='{"primary_narrative": "meme", "confidence": 85, "reasoning": "Animal name in symbol"}',
+                )
+            ]
         )
         client = AnthropicClassifierClient()
         result = await client.classify("DOGE", "Dogecoin", "uniswap")
@@ -36,7 +44,12 @@ class TestAnthropicClassifierClient:
 
     async def test_classify_handles_markdown_fences(self, mock_messages_create):
         mock_messages_create.create.return_value = MagicMock(
-            content=[MagicMock(type="text", text='```json\n{"primary_narrative": "defi", "confidence": 70, "reasoning": "DeFi protocol"}\n```')]
+            content=[
+                MagicMock(
+                    type="text",
+                    text='```json\n{"primary_narrative": "defi", "confidence": 70, "reasoning": "DeFi protocol"}\n```',
+                )
+            ]
         )
         client = AnthropicClassifierClient()
         result = await client.classify("UNI", "Uniswap", "uniswap")
@@ -45,7 +58,12 @@ class TestAnthropicClassifierClient:
 
     async def test_classify_without_dex(self, mock_messages_create):
         mock_messages_create.create.return_value = MagicMock(
-            content=[MagicMock(type="text", text='{"primary_narrative": "other", "confidence": 30, "reasoning": "Unclear from name"}')]
+            content=[
+                MagicMock(
+                    type="text",
+                    text='{"primary_narrative": "other", "confidence": 30, "reasoning": "Unclear from name"}',
+                )
+            ]
         )
         client = AnthropicClassifierClient()
         result = await client.classify("XYZ", "XYZ Token", None)
@@ -71,7 +89,12 @@ class TestAnthropicClassifierClient:
             if call_count < 2:
                 raise TimeoutError("timed out")
             return MagicMock(
-                content=[MagicMock(type="text", text='{"primary_narrative": "meme", "confidence": 80, "reasoning": "Meme coin"}')]
+                content=[
+                    MagicMock(
+                        type="text",
+                        text='{"primary_narrative": "meme", "confidence": 80, "reasoning": "Meme coin"}',
+                    )
+                ]
             )
 
         mock_messages_create.create.side_effect = _create

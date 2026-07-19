@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
-import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.collectors.anthropic_client import AnthropicClassifierClient
@@ -17,7 +16,9 @@ from app.services.narrative_classification_service import NarrativeClassificatio
 
 async def test_classify_token_persists_result(db_session: AsyncSession):
     token_repo = TokenRepository(db_session)
-    token = await token_repo.add(Token(chain=Chain.BASE, contract_address="0xnarr", name="Doge Moon", symbol="DMOON"))
+    token = await token_repo.add(
+        Token(chain=Chain.BASE, contract_address="0xnarr", name="Doge Moon", symbol="DMOON")
+    )
 
     client = AsyncMock(spec=AnthropicClassifierClient)
     client.classify.return_value = NarrativeClassificationResult(
@@ -35,13 +36,19 @@ async def test_classify_token_persists_result(db_session: AsyncSession):
 
 async def test_classify_unclassified_batch_continues_after_one_failure(db_session: AsyncSession):
     token_repo = TokenRepository(db_session)
-    good_token = await token_repo.add(Token(chain=Chain.BASE, contract_address="0xgood", name="Good Token", symbol="GOOD"))
-    bad_token = await token_repo.add(Token(chain=Chain.BASE, contract_address="0xbad", name="Bad Token", symbol="BAD"))
+    await token_repo.add(
+        Token(chain=Chain.BASE, contract_address="0xgood", name="Good Token", symbol="GOOD")
+    )
+    await token_repo.add(
+        Token(chain=Chain.BASE, contract_address="0xbad", name="Bad Token", symbol="BAD")
+    )
 
     client = AsyncMock(spec=AnthropicClassifierClient)
     client.classify.side_effect = [
         ValueError("simulated parse failure"),
-        NarrativeClassificationResult(primary_narrative=Narrative.OTHER, confidence=20, reasoning="No clear signal"),
+        NarrativeClassificationResult(
+            primary_narrative=Narrative.OTHER, confidence=20, reasoning="No clear signal"
+        ),
     ]
 
     repo = NarrativeRepository(db_session)

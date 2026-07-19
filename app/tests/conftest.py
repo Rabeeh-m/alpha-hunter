@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 from sqlalchemy import JSON
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.pool import StaticPool
 
@@ -11,6 +11,7 @@ from sqlalchemy.pool import StaticPool
 @compiles(JSONB, "sqlite")
 def _compile_jsonb_sqlite(type_, compiler, **kw):
     return compiler.process(JSON(), **kw)
+
 
 from app.core.database import Base
 from app.models.chain import Chain
@@ -73,13 +74,29 @@ def app_env(monkeypatch):
 @pytest.fixture
 async def seeded_tokens(db_session: AsyncSession) -> list[Token]:
     tokens = [
-        Token(chain=Chain.BASE, contract_address="0xaaa", name="Alpha Coin", symbol="ALPHA", liquidity_usd=Decimal("50000")),
-        Token(chain=Chain.BASE, contract_address="0xbbb", name="Beta Coin", symbol="BETA", liquidity_usd=None),
-        Token(chain=Chain.ETHEREUM, contract_address="0xccc", name="Gamma Token", symbol="GAMMA", liquidity_usd=Decimal("10000")),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xaaa",
+            name="Alpha Coin",
+            symbol="ALPHA",
+            liquidity_usd=Decimal("50000"),
+        ),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xbbb",
+            name="Beta Coin",
+            symbol="BETA",
+            liquidity_usd=None,
+        ),
+        Token(
+            chain=Chain.ETHEREUM,
+            contract_address="0xccc",
+            name="Gamma Token",
+            symbol="GAMMA",
+            liquidity_usd=Decimal("10000"),
+        ),
     ]
     for t in tokens:
         db_session.add(t)
     await db_session.flush()
     return tokens
-
-

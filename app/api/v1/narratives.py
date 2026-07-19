@@ -16,11 +16,15 @@ router = APIRouter(tags=["narratives"])
 
 
 @router.get("/tokens/{token_id}/narrative", response_model=NarrativeClassificationRead)
-async def get_token_narrative(token_id: UUID, db: AsyncSession = Depends(get_db)) -> NarrativeClassificationRead:
+async def get_token_narrative(
+    token_id: UUID, db: AsyncSession = Depends(get_db)
+) -> NarrativeClassificationRead:
     repo = NarrativeRepository(db)
     record = await repo.get_by_token_id(token_id)
     if record is None:
-        raise HTTPException(status_code=404, detail="Not classified yet -- call POST .../narrative/classify")
+        raise HTTPException(
+            status_code=404, detail="Not classified yet -- call POST .../narrative/classify"
+        )
     return NarrativeClassificationRead.model_validate(record)
 
 

@@ -36,7 +36,9 @@ class Settings(BaseSettings):
     database_max_overflow: int = 20
     database_echo: bool = False
 
-    etherscan_api_key: SecretStr | None = Field(default=None, description="Etherscan API key for wallet scanning")
+    etherscan_api_key: SecretStr | None = Field(
+        default=None, description="Etherscan API key for wallet scanning"
+    )
     redis_url: RedisDsn = Field(..., description="Used for caching and rate limiting")
     celery_broker_url: RedisDsn | None = None
     celery_result_backend: RedisDsn | None = None
@@ -56,6 +58,7 @@ class Settings(BaseSettings):
         return self.environment == Environment.PRODUCTION
 
     github_token: SecretStr | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:

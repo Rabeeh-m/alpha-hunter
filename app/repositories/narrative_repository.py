@@ -31,7 +31,10 @@ class NarrativeRepository(BaseRepository[NarrativeClassification]):
             return existing
 
         record = NarrativeClassification(
-            token_id=token_id, primary_narrative=narrative, confidence=confidence, reasoning=reasoning
+            token_id=token_id,
+            primary_narrative=narrative,
+            confidence=confidence,
+            reasoning=reasoning,
         )
         return await self.add(record)
 
@@ -50,12 +53,14 @@ class NarrativeRepository(BaseRepository[NarrativeClassification]):
 
     async def distribution(self) -> dict[str, int]:
         result = await self.session.execute(
-            select(NarrativeClassification.primary_narrative, func_count())
-            .group_by(NarrativeClassification.primary_narrative)
+            select(NarrativeClassification.primary_narrative, func_count()).group_by(
+                NarrativeClassification.primary_narrative
+            )
         )
         return {row[0].value: row[1] for row in result.all()}
 
 
 def func_count():
     from sqlalchemy import func
+
     return func.count()

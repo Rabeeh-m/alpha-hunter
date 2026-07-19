@@ -7,10 +7,13 @@ import pytest
 @pytest.fixture
 async def client(monkeypatch):
     monkeypatch.setenv("SECRET_KEY", "test-secret-key")
-    monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/alpha_hunter_test")
+    monkeypatch.setenv(
+        "DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/alpha_hunter_test"
+    )
     monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
 
     from app.main import create_app
+
     app = create_app()
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as c:

@@ -10,17 +10,24 @@ from app.core.database import get_db
 from app.repositories.contract_security_repository import ContractSecurityRepository
 from app.repositories.token_repository import TokenRepository
 from app.schemas.contract_security import ContractSecurityRead
-from app.services.contract_security_service import ContractSecurityService, UnsupportedChainForSecurityScan
+from app.services.contract_security_service import (
+    ContractSecurityService,
+    UnsupportedChainForSecurityScan,
+)
 
 router = APIRouter(prefix="/tokens/{token_id}/security", tags=["contract-security"])
 
 
 @router.get("", response_model=ContractSecurityRead)
-async def get_token_security(token_id: UUID, db: AsyncSession = Depends(get_db)) -> ContractSecurityRead:
+async def get_token_security(
+    token_id: UUID, db: AsyncSession = Depends(get_db)
+) -> ContractSecurityRead:
     repo = ContractSecurityRepository(db)
     record = await repo.get_by_token_id(token_id)
     if record is None:
-        raise HTTPException(status_code=404, detail="No security scan yet -- call POST .../security/scan first")
+        raise HTTPException(
+            status_code=404, detail="No security scan yet -- call POST .../security/scan first"
+        )
     return ContractSecurityRead.model_validate(record)
 
 

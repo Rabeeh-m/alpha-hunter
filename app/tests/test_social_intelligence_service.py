@@ -9,13 +9,18 @@ from app.models.token import Token
 from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository
 from app.repositories.token_repository import TokenRepository
-from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
+from app.services.social_intelligence_service import (
+    NoTelegramLinkAvailable,
+    SocialIntelligenceService,
+)
 from app.social.telegram_parser import TelegramChannelStats
 
 
 async def test_scan_token_raises_without_telegram_link(db_session: AsyncSession):
     token_repo = TokenRepository(db_session)
-    token = await token_repo.add(Token(chain=Chain.BASE, contract_address="0xnolink", name="No Link", symbol="NOL"))
+    token = await token_repo.add(
+        Token(chain=Chain.BASE, contract_address="0xnolink", name="No Link", symbol="NOL")
+    )
 
     client = TelegramClient()
     snapshot_repo = SocialSnapshotRepository(db_session)
@@ -29,11 +34,19 @@ async def test_scan_token_raises_without_telegram_link(db_session: AsyncSession)
 async def test_scan_token_persists_score_with_mocked_client(db_session: AsyncSession):
     token_repo = TokenRepository(db_session)
     token = await token_repo.add(
-        Token(chain=Chain.BASE, contract_address="0xsocial", name="Social Coin", symbol="SOC", telegram_url="https://t.me/socialcoin")
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xsocial",
+            name="Social Coin",
+            symbol="SOC",
+            telegram_url="https://t.me/socialcoin",
+        )
     )
 
     client = AsyncMock(spec=TelegramClient)
-    client.get_channel_stats.return_value = TelegramChannelStats(member_count=5000, message_count_24h=40)
+    client.get_channel_stats.return_value = TelegramChannelStats(
+        member_count=5000, message_count_24h=40
+    )
 
     snapshot_repo = SocialSnapshotRepository(db_session)
     score_repo = SocialScoreRepository(db_session)

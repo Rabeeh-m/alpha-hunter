@@ -5,8 +5,6 @@ from decimal import Decimal
 
 from app.core.logging import get_logger
 from app.models.token import Token
-from app.repositories.social_score_repository import SocialScoreRepository
-from app.repositories.developer_activity_repository import DeveloperActivityRepository
 from app.ranking.scoring import (
     ScoreBreakdown,
     age_score,
@@ -18,13 +16,14 @@ from app.ranking.scoring import (
     social_signal_score,
     volume_score,
 )
-from app.repositories.contract_security_repository import ContractSecurityRepository
 from app.repositories.alpha_score_repository import AlphaScoreRepository
+from app.repositories.contract_security_repository import ContractSecurityRepository
+from app.repositories.developer_activity_repository import DeveloperActivityRepository
+from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.token_repository import TokenRepository
 from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 
 log = get_logger(__name__)
-
 
 
 class RankingService:

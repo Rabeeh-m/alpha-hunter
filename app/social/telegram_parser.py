@@ -8,7 +8,7 @@ from app.core.logging import get_logger
 
 log = get_logger(__name__)
 
-_MEMBER_COUNT_RE = re.compile(r'([\d,]+)\s+(?:subscribers|members)', re.IGNORECASE)
+_MEMBER_COUNT_RE = re.compile(r"([\d,]+)\s+(?:subscribers|members)", re.IGNORECASE)
 _MESSAGE_TIME_RE = re.compile(r'<time[^>]*datetime="([^"]+)"')
 
 

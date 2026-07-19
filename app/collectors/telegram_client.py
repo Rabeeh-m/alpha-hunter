@@ -10,7 +10,7 @@ from app.social.telegram_parser import TelegramChannelStats, parse_telegram_prev
 
 log = get_logger(__name__)
 
-_CHANNEL_NAME_RE = re.compile(r't\.me/(?:s/)?([A-Za-z0-9_]+)')
+_CHANNEL_NAME_RE = re.compile(r"t\.me/(?:s/)?([A-Za-z0-9_]+)")
 
 
 def extract_channel_name(telegram_url: str) -> str | None:
@@ -31,7 +31,9 @@ class TelegramClient:
 
     @retry(
         stop=stop_after_attempt(2),  # lower than other clients -- this is best-effort scraping,
-        wait=wait_exponential(multiplier=1, min=1, max=5),  # not worth hammering a page with no API contract
+        wait=wait_exponential(
+            multiplier=1, min=1, max=5
+        ),  # not worth hammering a page with no API contract
         retry=retry_if_exception_type((httpx.TransportError, httpx.HTTPStatusError)),
         reraise=True,
     )

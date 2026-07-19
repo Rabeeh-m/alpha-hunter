@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import suppress
+
 import httpx
 import pytest
 from apscheduler.triggers.interval import IntervalTrigger
@@ -18,8 +20,12 @@ def _register_test_job():
     scheduler jobs being registered yet (order-independent from
     app.main import side effects)."""
     test_job = JobDefinition(
-        id="test-api-job", name="Test API Job", description="for API tests",
-        category="test", func=_dummy_job, interval_seconds=60,
+        id="test-api-job",
+        name="Test API Job",
+        description="for API tests",
+        category="test",
+        func=_dummy_job,
+        interval_seconds=60,
     )
     job_registry.register(test_job)
     scheduler.add_job(
@@ -31,19 +37,20 @@ def _register_test_job():
     )
     yield
     job_registry._jobs.pop("test-api-job", None)
-    try:
+    with suppress(Exception):
         scheduler.remove_job("test-api-job")
-    except Exception:
-        pass
 
 
 @pytest.fixture
 async def client(monkeypatch):
     monkeypatch.setenv("SECRET_KEY", "test-secret-key")
-    monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/alpha_hunter_test")
+    monkeypatch.setenv(
+        "DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/alpha_hunter_test"
+    )
     monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
 
     from app.main import create_app
+
     app = create_app()
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as c:

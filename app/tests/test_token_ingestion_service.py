@@ -3,8 +3,6 @@ from __future__ import annotations
 from decimal import Decimal
 from unittest.mock import AsyncMock
 
-import pytest
-
 from app.models.chain import Chain
 from app.schemas.token import TokenCreate
 from app.services.token_ingestion_service import TokenIngestionService
@@ -16,8 +14,12 @@ class _PassAllProvider:
     async def fetch_latest_tokens(self) -> list[TokenCreate]:
         return [
             TokenCreate(
-                chain=Chain.BASE, contract_address="0xgood1", name="Good1", symbol="GD1",
-                liquidity_usd=Decimal("50000"), volume_24h_usd=Decimal("1000"),
+                chain=Chain.BASE,
+                contract_address="0xgood1",
+                name="Good1",
+                symbol="GD1",
+                liquidity_usd=Decimal("50000"),
+                volume_24h_usd=Decimal("1000"),
             ),
         ]
 
@@ -28,20 +30,36 @@ class _JunkProvider:
     async def fetch_latest_tokens(self) -> list[TokenCreate]:
         return [
             TokenCreate(
-                chain=Chain.BASE, contract_address="0xjunk1", name="Junk1", symbol="JNK1",
-                liquidity_usd=Decimal("1"), volume_24h_usd=Decimal("1"),
+                chain=Chain.BASE,
+                contract_address="0xjunk1",
+                name="Junk1",
+                symbol="JNK1",
+                liquidity_usd=Decimal("1"),
+                volume_24h_usd=Decimal("1"),
             ),
             TokenCreate(
-                chain=Chain.BASE, contract_address="0xjunk2", name="Junk2", symbol="JNK2",
-                liquidity_usd=Decimal("5"), volume_24h_usd=None,
+                chain=Chain.BASE,
+                contract_address="0xjunk2",
+                name="Junk2",
+                symbol="JNK2",
+                liquidity_usd=Decimal("5"),
+                volume_24h_usd=None,
             ),
             TokenCreate(
-                chain=Chain.BASE, contract_address="0xjunk3", name="Junk3", symbol="JNK3",
-                liquidity_usd=None, volume_24h_usd=Decimal("2"),
+                chain=Chain.BASE,
+                contract_address="0xjunk3",
+                name="Junk3",
+                symbol="JNK3",
+                liquidity_usd=None,
+                volume_24h_usd=Decimal("2"),
             ),
             TokenCreate(
-                chain=Chain.SOLANA, contract_address="0xgood3", name="Good3", symbol="GD3",
-                liquidity_usd=Decimal("50000"), volume_24h_usd=Decimal("2000"),
+                chain=Chain.SOLANA,
+                contract_address="0xgood3",
+                name="Good3",
+                symbol="GD3",
+                liquidity_usd=Decimal("50000"),
+                volume_24h_usd=Decimal("2000"),
             ),
         ]
 
@@ -77,6 +95,7 @@ async def test_ingest_all_zero_tokens():
 
     class _EmptyProvider:
         name = "empty"
+
         async def fetch_latest_tokens(self) -> list[TokenCreate]:
             return []
 
@@ -85,6 +104,3 @@ async def test_ingest_all_zero_tokens():
 
     assert results == {"empty": 0}
     repository.upsert.assert_not_awaited()
-
-
-

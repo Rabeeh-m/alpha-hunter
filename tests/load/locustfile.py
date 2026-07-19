@@ -36,9 +36,7 @@ class ScreenerUser(HttpUser):
 
     @task(2)
     def search_tokens(self) -> None:
-        self.client.get(
-            "/api/v1/tokens", params={"search": "a"}, name="/api/v1/tokens [search]"
-        )
+        self.client.get("/api/v1/tokens", params={"search": "a"}, name="/api/v1/tokens [search]")
 
     @task(1)
     def health_check(self) -> None:

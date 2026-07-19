@@ -40,6 +40,8 @@ class NarrativeClassificationService:
                 # the whole batch -- log and continue, same "one failure
                 # doesn't stop the batch" principle as every collector
                 # loop since M3.
-                log.warning("narrative_classification_failed", token_id=str(token.id), error=str(exc))
+                log.warning(
+                    "narrative_classification_failed", token_id=str(token.id), error=str(exc)
+                )
                 failed += 1
         return {"classified": classified, "failed": failed}

@@ -26,7 +26,11 @@ def test_token_repr_contains_symbol_chain_and_address():
 
 
 def test_wallet_repr_contains_address_chain_and_type():
-    w = Wallet(chain=Chain.BASE, address="0xabcdef1234567890abcdef1234567890abcdef12", wallet_type=WalletType.WHALE)
+    w = Wallet(
+        chain=Chain.BASE,
+        address="0xabcdef1234567890abcdef1234567890abcdef12",
+        wallet_type=WalletType.WHALE,
+    )
     r = repr(w)
     assert "Wallet" in r
     assert "0xabcdef12" in r
@@ -79,7 +83,9 @@ def test_contract_security_repr_contains_token_id_and_safety_score():
 
 def test_job_run_repr_contains_job_id_status_and_time():
     now = datetime(2026, 7, 19, 12, 0, 0, tzinfo=UTC)
-    j = JobRun(job_id="fetch_prices", correlation_id="corr-1", status=JobStatus.SUCCESS, started_at=now)
+    j = JobRun(
+        job_id="fetch_prices", correlation_id="corr-1", status=JobStatus.SUCCESS, started_at=now
+    )
     r = repr(j)
     assert "JobRun" in r
     assert "fetch_prices" in r

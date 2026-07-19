@@ -13,9 +13,27 @@ from app.repositories.token_repository import TokenRepository
 async def seeded_repo(db_session):
     repo = TokenRepository(db_session)
     tokens = [
-        Token(chain=Chain.BASE, contract_address="0x1", name="Alpha Coin", symbol="ALPHA", liquidity_usd=Decimal("50000")),
-        Token(chain=Chain.BASE, contract_address="0x2", name="Beta Token", symbol="BETA", liquidity_usd=Decimal("5000")),
-        Token(chain=Chain.SOLANA, contract_address="0x3", name="Gamma", symbol="GAMMA", liquidity_usd=None),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0x1",
+            name="Alpha Coin",
+            symbol="ALPHA",
+            liquidity_usd=Decimal("50000"),
+        ),
+        Token(
+            chain=Chain.BASE,
+            contract_address="0x2",
+            name="Beta Token",
+            symbol="BETA",
+            liquidity_usd=Decimal("5000"),
+        ),
+        Token(
+            chain=Chain.SOLANA,
+            contract_address="0x3",
+            name="Gamma",
+            symbol="GAMMA",
+            liquidity_usd=None,
+        ),
     ]
     for t in tokens:
         await repo.add(t)
@@ -24,19 +42,25 @@ async def seeded_repo(db_session):
 
 
 async def test_search_filters_by_chain(seeded_repo):
-    results, total = await seeded_repo.search(chain=Chain.BASE, sort="-created_at", page=1, page_size=25)
+    results, total = await seeded_repo.search(
+        chain=Chain.BASE, sort="-created_at", page=1, page_size=25
+    )
     assert total == 2
     assert all(t.chain == Chain.BASE for t in results)
 
 
 async def test_search_filters_by_name_or_symbol(seeded_repo):
-    results, total = await seeded_repo.search(search="beta", sort="-created_at", page=1, page_size=25)
+    results, total = await seeded_repo.search(
+        search="beta", sort="-created_at", page=1, page_size=25
+    )
     assert total == 1
     assert results[0].symbol == "BETA"
 
 
 async def test_search_filters_by_min_liquidity(seeded_repo):
-    results, total = await seeded_repo.search(min_liquidity=Decimal("10000"), sort="-created_at", page=1, page_size=25)
+    results, total = await seeded_repo.search(
+        min_liquidity=Decimal("10000"), sort="-created_at", page=1, page_size=25
+    )
     assert total == 1
     assert results[0].symbol == "ALPHA"
 
@@ -53,7 +77,7 @@ async def test_search_pagination(seeded_repo):
     assert total == 3
     assert len(page_1) == 2
     assert len(page_2) == 1
-    
+
 
 async def test_search_sorts_by_alpha_score(db_session, seeded_tokens):
     """Confirms the outerjoin doesn't break existing search/filter/sort

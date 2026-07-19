@@ -15,6 +15,7 @@ from app.models.chain import Chain
 if TYPE_CHECKING:
     from app.models.alpha_score import AlphaScore
 
+
 class Token(Base, TimestampMixin):
     """
     A discovered token on a given chain.
@@ -46,11 +47,15 @@ class Token(Base, TimestampMixin):
     volume_24h_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 8), nullable=True)
     price_usd: Mapped[Decimal | None] = mapped_column(Numeric(38, 18), nullable=True)
     holder_count: Mapped[int | None] = mapped_column(nullable=True)
-    pair_created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
-    alpha_score: Mapped[AlphaScore | None] = relationship(back_populates="token", uselist=False, lazy="selectin")
+    pair_created_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True, index=True
+    )
+    alpha_score: Mapped[AlphaScore | None] = relationship(
+        back_populates="token", uselist=False, lazy="selectin"
+    )
     telegram_url: Mapped[str | None] = mapped_column(String(256), nullable=True)
     twitter_handle: Mapped[str | None] = mapped_column(String(128), nullable=True)
     github_url: Mapped[str | None] = mapped_column(String(256), nullable=True)
-    
+
     def __repr__(self) -> str:
         return f"<Token {self.symbol} ({self.chain}:{self.contract_address[:10]}...)>"

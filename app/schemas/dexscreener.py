@@ -3,13 +3,6 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
-class DexScreenerTokenProfile(BaseModel):
-    """One entry from GET /token-profiles/latest/v1."""
-
-    chain_id: str = Field(alias="chainId")
-    token_address: str = Field(alias="tokenAddress")
-
-
 class DexScreenerLiquidity(BaseModel):
     usd: float | None = None
 

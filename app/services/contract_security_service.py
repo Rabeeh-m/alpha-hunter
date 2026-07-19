@@ -38,7 +38,10 @@ class ContractSecurityService:
         await self._repository.upsert(token.id, risk)
 
         log.info(
-            "contract_security_scan_complete", token_id=str(token.id), symbol=token.symbol,
-            safety_score=risk.safety_score, is_honeypot=risk.is_honeypot,
+            "contract_security_scan_complete",
+            token_id=str(token.id),
+            symbol=token.symbol,
+            safety_score=risk.safety_score,
+            is_honeypot=risk.is_honeypot,
         )
         return risk.safety_score

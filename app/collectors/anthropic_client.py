@@ -23,7 +23,9 @@ MODEL = "claude-haiku-4-5-20251001"
 class AnthropicClassifierClient:
     def __init__(self) -> None:
         settings = get_settings()
-        api_key = settings.anthropic_api_key.get_secret_value() if settings.anthropic_api_key else None
+        api_key = (
+            settings.anthropic_api_key.get_secret_value() if settings.anthropic_api_key else None
+        )
         self._client = AsyncAnthropic(api_key=api_key)
 
     @retry(
@@ -32,7 +34,9 @@ class AnthropicClassifierClient:
         retry=retry_if_exception_type((TimeoutError, ConnectionError)),
         reraise=True,
     )
-    async def classify(self, symbol: str, name: str, dex: str | None) -> NarrativeClassificationResult:
+    async def classify(
+        self, symbol: str, name: str, dex: str | None
+    ) -> NarrativeClassificationResult:
         response = await self._client.messages.create(
             model=MODEL,
             max_tokens=150,
@@ -45,7 +49,9 @@ class AnthropicClassifierClient:
 
         result = parse_classification_response(text_block.text)
         log.info(
-            "narrative_classified", symbol=symbol, narrative=result.primary_narrative.value,
+            "narrative_classified",
+            symbol=symbol,
+            narrative=result.primary_narrative.value,
             confidence=result.confidence,
         )
         return result

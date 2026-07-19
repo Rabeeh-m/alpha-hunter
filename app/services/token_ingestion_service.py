@@ -56,7 +56,9 @@ class TokenIngestionService:
             results[provider.name] = ingested
             log.info(
                 "provider_ingestion_complete",
-                provider=provider.name, count=ingested, skipped=skipped,
+                provider=provider.name,
+                count=ingested,
+                skipped=skipped,
             )
         return results
 

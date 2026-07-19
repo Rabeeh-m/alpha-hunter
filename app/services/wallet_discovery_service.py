@@ -57,21 +57,32 @@ class WalletDiscoveryService:
 
         for address, balance, rank in top_holders:
             wallet_type, confidence = classify_holder(rank, len(top_holders))
-            wallet = await self._wallet_repo.get_or_create(token.chain, address, wallet_type, confidence)
-            holding, previous_balance = await self._holding_repo.upsert(token.id, wallet.id, balance, rank)
+            wallet = await self._wallet_repo.get_or_create(
+                token.chain, address, wallet_type, confidence
+            )
+            holding, previous_balance = await self._holding_repo.upsert(
+                token.id, wallet.id, balance, rank
+            )
 
             detection = classify_balance_change(previous_balance, balance, token.price_usd)
             if detection is not None:
                 self._whale_event_repo.session.add(
                     WhaleEvent(
-                        token_id=token.id, wallet_id=wallet.id, event_type=detection.event_type,
-                        previous_balance=previous_balance, new_balance=balance,
-                        change_pct=detection.change_pct, change_usd=detection.change_usd,
+                        token_id=token.id,
+                        wallet_id=wallet.id,
+                        event_type=detection.event_type,
+                        previous_balance=previous_balance,
+                        new_balance=balance,
+                        change_pct=detection.change_pct,
+                        change_usd=detection.change_usd,
                     )
                 )
 
         log.info(
-            "wallet_scan_complete", token_id=str(token.id), symbol=token.symbol,
-            transfers_analyzed=len(transfers), holders_found=len(top_holders),
+            "wallet_scan_complete",
+            token_id=str(token.id),
+            symbol=token.symbol,
+            transfers_analyzed=len(transfers),
+            holders_found=len(top_holders),
         )
         return len(top_holders)

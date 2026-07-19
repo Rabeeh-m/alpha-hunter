@@ -11,9 +11,14 @@ from app.core.logging import configure_logging
 from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository
 from app.repositories.token_repository import TokenRepository
-from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
+from app.services.social_intelligence_service import (
+    NoTelegramLinkAvailable,
+    SocialIntelligenceService,
+)
 
-social_app = typer.Typer(help="On-demand social signal scanning (Telegram only -- see docs on Twitter/X exclusion).")
+social_app = typer.Typer(
+    help="On-demand social signal scanning (Telegram only -- see docs on Twitter/X exclusion)."
+)
 
 
 @social_app.command("scan")

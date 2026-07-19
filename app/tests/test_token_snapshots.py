@@ -39,16 +39,20 @@ async def test_list_for_token_excludes_snapshots_before_since(db_session, seeded
     await repo.add_snapshot(seeded_token)
     await db_session.flush()
 
-    recent = await repo.list_for_token(seeded_token.id, since=datetime.now(UTC) - timedelta(hours=1))
-    future_cutoff = await repo.list_for_token(seeded_token.id, since=datetime.now(UTC) + timedelta(hours=1))
+    recent = await repo.list_for_token(
+        seeded_token.id, since=datetime.now(UTC) - timedelta(hours=1)
+    )
+    future_cutoff = await repo.list_for_token(
+        seeded_token.id, since=datetime.now(UTC) + timedelta(hours=1)
+    )
 
     assert len(recent) == 1
     assert len(future_cutoff) == 0
 
 
 async def test_get_token_returns_404_for_unknown_id(db_session):
-    from app.main import create_app
     from app.core.database import get_db
+    from app.main import create_app
 
     app = create_app()
     app.dependency_overrides[get_db] = lambda: db_session
@@ -60,14 +64,16 @@ async def test_get_token_returns_404_for_unknown_id(db_session):
 
 
 async def test_get_token_snapshots_returns_empty_list_for_new_token(db_session, seeded_token):
-    from app.main import create_app
     from app.core.database import get_db
+    from app.main import create_app
 
     app = create_app()
     app.dependency_overrides[get_db] = lambda: db_session
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get(f"/api/v1/tokens/{seeded_token.id}/snapshots", params={"hours": 1})
+        response = await client.get(
+            f"/api/v1/tokens/{seeded_token.id}/snapshots", params={"hours": 1}
+        )
 
     assert response.status_code == 200
     assert response.json() == []

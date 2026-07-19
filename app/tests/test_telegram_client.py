@@ -46,9 +46,7 @@ class TestTelegramClient:
 
     @respx.mock
     async def test_returns_none_on_404(self, http_client):
-        respx.get("https://t.me/s/mychannel").mock(
-            return_value=httpx.Response(404)
-        )
+        respx.get("https://t.me/s/mychannel").mock(return_value=httpx.Response(404))
         client = TelegramClient(http_client=http_client)
         stats = await client.get_channel_stats("https://t.me/mychannel")
         assert stats is None

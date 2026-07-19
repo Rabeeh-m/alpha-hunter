@@ -13,14 +13,20 @@ def test_fresh_active_repo_scores_well():
 
 
 def test_stale_repo_scores_poorly():
-    repo = GitHubRepo(stargazers_count=500, forks_count=50, pushed_at=datetime.now(UTC) - timedelta(days=400))
+    repo = GitHubRepo(
+        stargazers_count=500, forks_count=50, pushed_at=datetime.now(UTC) - timedelta(days=400)
+    )
     result = compute_developer_activity(repo, contributor_count=10, release_count=5)
     assert result.score < 50
 
 
 def test_fork_flag_applies_penalty_not_zero():
-    base_repo = GitHubRepo(stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), fork=False)
-    forked_repo = GitHubRepo(stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), fork=True)
+    base_repo = GitHubRepo(
+        stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), fork=False
+    )
+    forked_repo = GitHubRepo(
+        stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), fork=True
+    )
 
     base_result = compute_developer_activity(base_repo, contributor_count=5, release_count=2)
     fork_result = compute_developer_activity(forked_repo, contributor_count=5, release_count=2)
@@ -30,8 +36,12 @@ def test_fork_flag_applies_penalty_not_zero():
 
 
 def test_archived_repo_penalized_harder_than_fork():
-    archived = GitHubRepo(stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), archived=True)
-    forked = GitHubRepo(stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), fork=True)
+    archived = GitHubRepo(
+        stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), archived=True
+    )
+    forked = GitHubRepo(
+        stargazers_count=100, forks_count=10, pushed_at=datetime.now(UTC), fork=True
+    )
 
     archived_result = compute_developer_activity(archived, contributor_count=5, release_count=2)
     fork_result = compute_developer_activity(forked, contributor_count=5, release_count=2)

@@ -4,8 +4,8 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid4
 
-from sqlalchemy import Enum as SAEnum, Uuid
-from sqlalchemy import Integer, String, Text, DateTime
+from sqlalchemy import DateTime, Integer, String, Text, Uuid
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -34,7 +34,9 @@ class JobRun(Base):
     job_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     correlation_id: Mapped[str] = mapped_column(String(64), nullable=False)
 
-    status: Mapped[JobStatus] = mapped_column(SAEnum(JobStatus, name="job_status_enum"), nullable=False)
+    status: Mapped[JobStatus] = mapped_column(
+        SAEnum(JobStatus, name="job_status_enum"), nullable=False
+    )
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)

@@ -1,9 +1,10 @@
 import asyncio
 import time
+
 import httpx
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
-from app.core.cache import cache_get, cache_set
+from app.core.cache import cache_set
 from app.core.logging import get_logger
 from app.schemas.geckoterminal import GeckoTerminalPool
 
@@ -35,7 +36,9 @@ class GeckoTerminalClient:
     """Thin HTTP client over GeckoTerminal's public API. Same shape as
     DexScreenerClient by design: fetch + cache + retry only."""
 
-    def __init__(self, http_client: httpx.AsyncClient | None = None, rate_limit_interval: float = 2.0) -> None:
+    def __init__(
+        self, http_client: httpx.AsyncClient | None = None, rate_limit_interval: float = 2.0
+    ) -> None:
         self._client = http_client or httpx.AsyncClient(base_url=BASE_URL, timeout=10.0)
         self._lock = asyncio.Lock()
         self._last_request_time = 0.0
@@ -63,7 +66,7 @@ class GeckoTerminalClient:
         return response.json()
 
     async def get_new_pools(self, network: str) -> list[GeckoTerminalPool]:
-        # Always fetch fresh data to ensure test isolation; caching is still performed for production use.
+        # Always fetch fresh data; caching still works for production use.
         cache_key = f"geckoterminal:new_pools:{network}"
         raw = await self._get(f"/networks/{network}/new_pools")
         data = raw.get("data", [])

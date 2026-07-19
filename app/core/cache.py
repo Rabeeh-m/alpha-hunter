@@ -1,7 +1,6 @@
 import asyncio
 import json
 import weakref
-from typing import Any
 
 from redis.asyncio import Redis, from_url
 
@@ -10,7 +9,10 @@ from app.core.config import get_settings
 # Cache Redis client instances per event loop. Using a WeakKeyDictionary ensures
 # that once an event loop is closed and garbage collected (e.g. at the end of a pytest test),
 # the corresponding Redis client is cleaned up as well as its connection pool.
-_redis_clients: weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, Redis] = weakref.WeakKeyDictionary()
+_redis_clients: weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, Redis] = (
+    weakref.WeakKeyDictionary()
+)
+
 
 def get_redis() -> Redis:
     try:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -120,7 +121,9 @@ class TestIngestCommand:
     @patch("app.cli.commands.ingest.TokenIngestionService")
     @patch("app.cli.commands.ingest.DexScreenerProvider")
     @patch("app.cli.commands.ingest.GeckoTerminalProvider")
-    def test_ingest_geckoterminal_only(self, mock_gt, mock_ds, mock_svc, mock_factory, mock_session):
+    def test_ingest_geckoterminal_only(
+        self, mock_gt, mock_ds, mock_svc, mock_factory, mock_session
+    ):
         mock_factory.return_value = mock_session
         mock_ds_instance = AsyncMock()
         mock_ds.return_value = mock_ds_instance
@@ -146,7 +149,15 @@ class TestNarrativeCommands:
     @patch("app.cli.commands.narratives.NarrativeRepository")
     @patch("app.cli.commands.narratives.AnthropicClassifierClient")
     @patch("app.cli.commands.narratives.TokenRepository")
-    def test_classify_token(self, mock_token_repo_cls, mock_client_cls, mock_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_classify_token(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         mock_factory.return_value = mock_session
         token = _make_mock_token()
         token_repo = AsyncMock()
@@ -176,7 +187,9 @@ class TestNarrativeCommands:
     @patch("app.cli.commands.narratives.NarrativeClassificationService")
     @patch("app.cli.commands.narratives.NarrativeRepository")
     @patch("app.cli.commands.narratives.AnthropicClassifierClient")
-    def test_classify_batch(self, mock_client_cls, mock_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_classify_batch(
+        self, mock_client_cls, mock_repo_cls, mock_svc_cls, mock_factory, mock_session
+    ):
         mock_factory.return_value = mock_session
         mock_client_cls.return_value = AsyncMock()
         mock_repo_cls.return_value = AsyncMock()
@@ -211,7 +224,15 @@ class TestSecurityCommands:
     @patch("app.cli.commands.security.ContractSecurityRepository")
     @patch("app.cli.commands.security.GoPlusClient")
     @patch("app.cli.commands.security.TokenRepository")
-    def test_scan_token(self, mock_token_repo_cls, mock_client_cls, mock_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_scan_token(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         mock_factory.return_value = mock_session
         token = _make_mock_token()
         token_repo = AsyncMock()
@@ -246,7 +267,15 @@ class TestSecurityCommands:
     @patch("app.cli.commands.security.ContractSecurityRepository")
     @patch("app.cli.commands.security.GoPlusClient")
     @patch("app.cli.commands.security.TokenRepository")
-    def test_scan_unsupported_chain(self, mock_token_repo_cls, mock_client_cls, mock_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_scan_unsupported_chain(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         from app.services.contract_security_service import UnsupportedChainForSecurityScan
 
         mock_factory.return_value = mock_session
@@ -274,7 +303,16 @@ class TestSocialCommands:
     @patch("app.cli.commands.social.SocialScoreRepository")
     @patch("app.cli.commands.social.TelegramClient")
     @patch("app.cli.commands.social.TokenRepository")
-    def test_scan_token(self, mock_token_repo_cls, mock_client_cls, mock_score_repo_cls, mock_snapshot_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_scan_token(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_score_repo_cls,
+        mock_snapshot_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         mock_factory.return_value = mock_session
         token = _make_mock_token()
         token_repo = AsyncMock()
@@ -311,7 +349,16 @@ class TestSocialCommands:
     @patch("app.cli.commands.social.SocialScoreRepository")
     @patch("app.cli.commands.social.TelegramClient")
     @patch("app.cli.commands.social.TokenRepository")
-    def test_scan_no_telegram_link(self, mock_token_repo_cls, mock_client_cls, mock_score_repo_cls, mock_snapshot_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_scan_no_telegram_link(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_score_repo_cls,
+        mock_snapshot_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         from app.services.social_intelligence_service import NoTelegramLinkAvailable
 
         mock_factory.return_value = mock_session
@@ -340,7 +387,16 @@ class TestWalletsCommands:
     @patch("app.cli.commands.wallets.WalletRepository")
     @patch("app.cli.commands.wallets.EtherscanClient")
     @patch("app.cli.commands.wallets.TokenRepository")
-    def test_scan_token(self, mock_token_repo_cls, mock_client_cls, mock_wallet_repo_cls, mock_holding_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_scan_token(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_wallet_repo_cls,
+        mock_holding_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         mock_factory.return_value = mock_session
         token = _make_mock_token()
         token_repo = AsyncMock()
@@ -377,7 +433,16 @@ class TestWalletsCommands:
     @patch("app.cli.commands.wallets.WalletRepository")
     @patch("app.cli.commands.wallets.EtherscanClient")
     @patch("app.cli.commands.wallets.TokenRepository")
-    def test_scan_unsupported_chain(self, mock_token_repo_cls, mock_client_cls, mock_wallet_repo_cls, mock_holding_repo_cls, mock_svc_cls, mock_factory, mock_session):
+    def test_scan_unsupported_chain(
+        self,
+        mock_token_repo_cls,
+        mock_client_cls,
+        mock_wallet_repo_cls,
+        mock_holding_repo_cls,
+        mock_svc_cls,
+        mock_factory,
+        mock_session,
+    ):
         from app.services.wallet_discovery_service import UnsupportedChainForWalletScan
 
         mock_factory.return_value = mock_session
@@ -403,7 +468,7 @@ class TestWhalesCommands:
     @patch("app.cli.commands.whales.async_session_factory")
     @patch("app.cli.commands.whales.WhaleEventRepository")
     def test_recent_shows_events(self, mock_repo_cls, mock_factory, mock_session):
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         mock_factory.return_value = mock_session
         mock_token = MagicMock(spec=["symbol"])
@@ -412,7 +477,7 @@ class TestWhalesCommands:
         mock_wallet.label = "Whale1"
         mock_wallet.address = "0xdeadbeef0123456789abcdef"
         mock_event = MagicMock(spec=["detected_at", "token", "event_type", "change_usd", "wallet"])
-        mock_event.detected_at = datetime(2026, 7, 19, tzinfo=timezone.utc)
+        mock_event.detected_at = datetime(2026, 7, 19, tzinfo=UTC)
         mock_event.token = mock_token
         mock_event.event_type.value = "new_position"
         mock_event.change_usd = 50000

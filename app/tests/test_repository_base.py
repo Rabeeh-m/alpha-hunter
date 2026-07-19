@@ -3,11 +3,9 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database.session import get_db
 from app.models.chain import Chain
 from app.models.token import Token
 from app.repositories.base import BaseRepository
@@ -23,7 +21,10 @@ async def test_list_all_returns_paginated_tokens(db_session: AsyncSession):
     repo = TokenBaseRepo(db_session)
     for i in range(5):
         token = Token(
-            chain=Chain.BASE, contract_address=f"0xlist{i}", name=f"Token{i}", symbol=f"T{i}",
+            chain=Chain.BASE,
+            contract_address=f"0xlist{i}",
+            name=f"Token{i}",
+            symbol=f"T{i}",
             liquidity_usd=Decimal("1000"),
         )
         db_session.add(token)
@@ -45,14 +46,20 @@ async def test_list_all_returns_empty_when_no_tokens(db_session: AsyncSession):
 async def test_upsert_updates_existing_token_gracefully(db_session: AsyncSession):
     repo = TokenRepository(db_session)
     original = TokenCreate(
-        chain=Chain.BASE, contract_address="0xgrace", name="Original", symbol="ORG",
+        chain=Chain.BASE,
+        contract_address="0xgrace",
+        name="Original",
+        symbol="ORG",
         liquidity_usd=Decimal("50000"),
     )
     first = await repo.upsert(original)
     assert first.name == "Original"
 
     update = TokenCreate(
-        chain=Chain.BASE, contract_address="0xgrace", name="Updated", symbol="UPD",
+        chain=Chain.BASE,
+        contract_address="0xgrace",
+        name="Updated",
+        symbol="UPD",
         liquidity_usd=Decimal("100"),
     )
     second = await repo.upsert(update)
@@ -62,15 +69,23 @@ async def test_upsert_updates_existing_token_gracefully(db_session: AsyncSession
 
 async def test_concurrent_insert_raises_integrity_error(db_session: AsyncSession):
     repo = TokenRepository(db_session)
-    await repo.upsert(TokenCreate(
-        chain=Chain.BASE, contract_address="0xconcurrent", name="First", symbol="1ST",
-        liquidity_usd=Decimal("50000"),
-    ))
+    await repo.upsert(
+        TokenCreate(
+            chain=Chain.BASE,
+            contract_address="0xconcurrent",
+            name="First",
+            symbol="1ST",
+            liquidity_usd=Decimal("50000"),
+        )
+    )
     await db_session.flush()
 
     with pytest.raises(IntegrityError):
         duplicate = Token(
-            chain=Chain.BASE, contract_address="0xconcurrent", name="Second", symbol="2ND",
+            chain=Chain.BASE,
+            contract_address="0xconcurrent",
+            name="Second",
+            symbol="2ND",
             liquidity_usd=Decimal("100"),
         )
         db_session.add(duplicate)

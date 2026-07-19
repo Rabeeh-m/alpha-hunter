@@ -5,7 +5,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, ForeignKey, JSON, Numeric, Uuid, func
+from sqlalchemy import JSON, DateTime, ForeignKey, Numeric, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -39,7 +39,7 @@ class AlphaScore(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    token: Mapped["Token"] = relationship(back_populates="alpha_score")
+    token: Mapped[Token] = relationship(back_populates="alpha_score")
 
     def __repr__(self) -> str:
         return f"<AlphaScore token_id={self.token_id} score={self.score}>"

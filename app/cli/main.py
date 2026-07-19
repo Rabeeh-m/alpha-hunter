@@ -5,12 +5,12 @@ import typer
 from app.cli.commands import db as db_commands
 from app.cli.commands import ingest as ingest_commands
 from app.cli.commands import jobs as jobs_commands
-from app.cli.commands import rank as rank_commands
-from app.cli.commands import wallets as wallets_commands
-from app.cli.commands import security as security_commands
-from app.cli.commands import whales as whales_commands
-from app.cli.commands import social as social_commands
 from app.cli.commands import narratives as narrative_commands
+from app.cli.commands import rank as rank_commands
+from app.cli.commands import security as security_commands
+from app.cli.commands import social as social_commands
+from app.cli.commands import wallets as wallets_commands
+from app.cli.commands import whales as whales_commands
 
 app = typer.Typer(
     name="alpha-hunter",

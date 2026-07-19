@@ -30,4 +30,8 @@ async def _run(limit: int) -> None:
     for e in events:
         sign = "+" if e.event_type.value in ("new_position", "increased") else "-"
         usd = f"${abs(e.change_usd):,.0f}" if e.change_usd else "?"
-        typer.echo(f"{e.detected_at.isoformat()}  {e.token.symbol:<10} {e.event_type.value:<14} {sign}{usd}  {e.wallet.label or e.wallet.address[:12]}")
+        label = e.wallet.label or e.wallet.address[:12]
+        typer.echo(
+            f"{e.detected_at.isoformat()}  {e.token.symbol:<10}"
+            f" {e.event_type.value:<14} {sign}{usd}  {label}"
+        )

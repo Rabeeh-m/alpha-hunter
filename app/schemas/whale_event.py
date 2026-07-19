@@ -26,11 +26,18 @@ class WhaleEventRead(BaseModel):
     detected_at: datetime
 
     @classmethod
-    def from_event(cls, event: WhaleEvent) -> "WhaleEventRead":
+    def from_event(cls, event: WhaleEvent) -> WhaleEventRead:
         return cls(
-            id=event.id, token_symbol=event.token.symbol, token_chain=event.token.chain,
-            wallet_address=event.wallet.address, wallet_label=event.wallet.label,
-            wallet_type=event.wallet.wallet_type, event_type=event.event_type,
-            previous_balance=event.previous_balance, new_balance=event.new_balance,
-            change_pct=event.change_pct, change_usd=event.change_usd, detected_at=event.detected_at,
+            id=event.id,
+            token_symbol=event.token.symbol,
+            token_chain=event.token.chain,
+            wallet_address=event.wallet.address,
+            wallet_label=event.wallet.label,
+            wallet_type=event.wallet.wallet_type,
+            event_type=event.event_type,
+            previous_balance=event.previous_balance,
+            new_balance=event.new_balance,
+            change_pct=event.change_pct,
+            change_usd=event.change_usd,
+            detected_at=event.detected_at,
         )

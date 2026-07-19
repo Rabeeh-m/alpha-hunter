@@ -1,38 +1,43 @@
 from __future__ import annotations
 
+from app.blockchain.chain_ids import is_evm_chain
+from app.collectors.anthropic_client import AnthropicClassifierClient
 from app.collectors.dexscreener_provider import DexScreenerProvider
+from app.collectors.etherscan_client import EtherscanClient
 from app.collectors.geckoterminal_provider import GeckoTerminalProvider
 from app.collectors.github_client import GitHubClient
+from app.collectors.telegram_client import TelegramClient
 from app.core.database.session import async_session_factory
-from app.repositories.developer_activity_repository import DeveloperActivityRepository
-from app.repositories.token_repository import TokenRepository
-from app.services.developer_intelligence_service import DeveloperIntelligenceService, NoRepoLinkAvailable, RepoNotFound
-from app.services.token_ingestion_service import TokenIngestionService
-from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.repositories.alpha_score_repository import AlphaScoreRepository
-from app.services.ranking_service import RankingService
 from app.repositories.contract_security_repository import ContractSecurityRepository
-from app.blockchain.chain_ids import is_evm_chain
-from app.collectors.etherscan_client import EtherscanClient
+from app.repositories.developer_activity_repository import DeveloperActivityRepository
+from app.repositories.narrative_repository import NarrativeRepository
+from app.repositories.social_score_repository import SocialScoreRepository
+from app.repositories.social_snapshot_repository import SocialSnapshotRepository
+from app.repositories.token_repository import TokenRepository
+from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.repositories.wallet_holding_repository import WalletHoldingRepository
 from app.repositories.wallet_repository import WalletRepository
 from app.repositories.whale_event_repository import WhaleEventRepository
-from app.services.wallet_discovery_service import WalletDiscoveryService
-from app.collectors.telegram_client import TelegramClient
-from app.repositories.social_score_repository import SocialScoreRepository
-from app.repositories.social_snapshot_repository import SocialSnapshotRepository
-from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
-from app.repositories.social_score_repository import SocialScoreRepository
-from app.collectors.anthropic_client import AnthropicClassifierClient
-from app.repositories.narrative_repository import NarrativeRepository
+from app.services.developer_intelligence_service import (
+    DeveloperIntelligenceService,
+    NoRepoLinkAvailable,
+    RepoNotFound,
+)
 from app.services.narrative_classification_service import NarrativeClassificationService
-from app.repositories.developer_activity_repository import DeveloperActivityRepository
-
+from app.services.ranking_service import RankingService
+from app.services.social_intelligence_service import (
+    NoTelegramLinkAvailable,
+    SocialIntelligenceService,
+)
+from app.services.token_ingestion_service import TokenIngestionService
+from app.services.wallet_discovery_service import WalletDiscoveryService
 
 NARRATIVE_CLASSIFICATION_BATCH_SIZE = 20
 TOP_N_TOKENS_FOR_SOCIAL_MONITORING = 10
 TOP_N_TOKENS_FOR_WHALE_MONITORING = 10  # bounded scope -- see milestone note on rate limits
 TOP_N_TOKENS_FOR_DEVELOPER_MONITORING = 10
+
 
 async def refresh_dexscreener() -> dict[str, int]:
     provider = DexScreenerProvider()
@@ -60,7 +65,7 @@ async def refresh_geckoterminal() -> dict[str, int]:
             return results
     finally:
         await provider.close()
-        
+
 
 async def compute_alpha_scores() -> dict[str, int]:
     async with async_session_factory() as session:
@@ -71,13 +76,17 @@ async def compute_alpha_scores() -> dict[str, int]:
         social_score_repo = SocialScoreRepository(session)
         developer_activity_repo = DeveloperActivityRepository(session)
         service = RankingService(
-            token_repo, snapshot_repo, alpha_score_repo, contract_security_repo,
-            social_score_repo, developer_activity_repo,
+            token_repo,
+            snapshot_repo,
+            alpha_score_repo,
+            contract_security_repo,
+            social_score_repo,
+            developer_activity_repo,
         )
         count = await service.compute_all()
         await session.commit()
         return {"tokens_scored": count}
-    
+
 
 async def scan_top_tokens_for_whale_activity() -> dict[str, int]:
     """Automatic whale monitoring, DELIBERATELY BOUNDED to the top N
@@ -91,7 +100,9 @@ async def scan_top_tokens_for_whale_activity() -> dict[str, int]:
     try:
         async with async_session_factory() as session:
             token_repo = TokenRepository(session)
-            tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_WHALE_MONITORING)
+            tokens, _ = await token_repo.search(
+                sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_WHALE_MONITORING
+            )
 
             wallet_repo = WalletRepository(session)
             holding_repo = WalletHoldingRepository(session)
@@ -122,7 +133,9 @@ async def scan_top_tokens_for_social_activity() -> dict[str, int]:
     try:
         async with async_session_factory() as session:
             token_repo = TokenRepository(session)
-            tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_SOCIAL_MONITORING)
+            tokens, _ = await token_repo.search(
+                sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_SOCIAL_MONITORING
+            )
 
             snapshot_repo = SocialSnapshotRepository(session)
             score_repo = SocialScoreRepository(session)
@@ -150,7 +163,9 @@ async def classify_unclassified_narratives() -> dict[str, int]:
         client = AnthropicClassifierClient()
         repo = NarrativeRepository(session)
         service = NarrativeClassificationService(client, repo)
-        result = await service.classify_unclassified_batch(limit=NARRATIVE_CLASSIFICATION_BATCH_SIZE)
+        result = await service.classify_unclassified_batch(
+            limit=NARRATIVE_CLASSIFICATION_BATCH_SIZE
+        )
         await session.commit()
         return result
 
@@ -161,7 +176,9 @@ async def scan_top_tokens_for_developer_activity() -> dict[str, int]:
     try:
         async with async_session_factory() as session:
             token_repo = TokenRepository(session)
-            tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_DEVELOPER_MONITORING)
+            tokens, _ = await token_repo.search(
+                sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_DEVELOPER_MONITORING
+            )
             repo = DeveloperActivityRepository(session)
             service = DeveloperIntelligenceService(client, repo)
             for token in tokens:

@@ -25,9 +25,11 @@ def mock_session_factory():
 async def test_refresh_dexscreener_calls_ingest_all_and_commits(mock_session_factory):
     mock_factory, mock_session = mock_session_factory
 
-    with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-         patch("app.scheduler.jobs.DexScreenerProvider") as MockProvider, \
-         patch("app.scheduler.jobs.TokenIngestionService") as MockService:
+    with (
+        patch("app.scheduler.jobs.async_session_factory", mock_factory),
+        patch("app.scheduler.jobs.DexScreenerProvider") as MockProvider,
+        patch("app.scheduler.jobs.TokenIngestionService") as MockService,
+    ):
         mock_provider_instance = AsyncMock()
         MockProvider.return_value = mock_provider_instance
         mock_service_instance = AsyncMock()
@@ -48,9 +50,11 @@ async def test_refresh_dexscreener_closes_provider_even_on_failure(mock_session_
     open httpx client every time it fails."""
     mock_factory, _ = mock_session_factory
 
-    with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-         patch("app.scheduler.jobs.DexScreenerProvider") as MockProvider, \
-         patch("app.scheduler.jobs.TokenIngestionService") as MockService:
+    with (
+        patch("app.scheduler.jobs.async_session_factory", mock_factory),
+        patch("app.scheduler.jobs.DexScreenerProvider") as MockProvider,
+        patch("app.scheduler.jobs.TokenIngestionService") as MockService,
+    ):
         mock_provider_instance = AsyncMock()
         MockProvider.return_value = mock_provider_instance
         mock_service_instance = AsyncMock()
@@ -66,9 +70,11 @@ async def test_refresh_dexscreener_closes_provider_even_on_failure(mock_session_
 async def test_refresh_geckoterminal_calls_ingest_all(mock_session_factory):
     mock_factory, mock_session = mock_session_factory
 
-    with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-         patch("app.scheduler.jobs.GeckoTerminalProvider") as MockProvider, \
-         patch("app.scheduler.jobs.TokenIngestionService") as MockService:
+    with (
+        patch("app.scheduler.jobs.async_session_factory", mock_factory),
+        patch("app.scheduler.jobs.GeckoTerminalProvider") as MockProvider,
+        patch("app.scheduler.jobs.TokenIngestionService") as MockService,
+    ):
         MockProvider.return_value = AsyncMock()
         mock_service_instance = AsyncMock()
         mock_service_instance.ingest_all.return_value = {"geckoterminal": 8}
@@ -83,8 +89,10 @@ async def test_refresh_geckoterminal_calls_ingest_all(mock_session_factory):
 async def test_compute_alpha_scores_calls_ranking_service(mock_session_factory):
     mock_factory, mock_session = mock_session_factory
 
-    with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-         patch("app.scheduler.jobs.RankingService") as MockService:
+    with (
+        patch("app.scheduler.jobs.async_session_factory", mock_factory),
+        patch("app.scheduler.jobs.RankingService") as MockService,
+    ):
         mock_service_instance = AsyncMock()
         mock_service_instance.compute_all.return_value = 12
         MockService.return_value = mock_service_instance

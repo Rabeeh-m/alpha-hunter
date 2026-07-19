@@ -29,7 +29,9 @@ def activity_score(message_count_24h: int | None) -> float:
     return max(0.0, min(100.0, normalized * 100))
 
 
-def member_growth_signal(previous_count: int | None, current_count: int | None) -> tuple[float, bool]:
+def member_growth_signal(
+    previous_count: int | None, current_count: int | None
+) -> tuple[float, bool]:
     """Returns (score, possible_inorganic_growth). 50 = neutral (no
     history or no change) -- same 'don't penalize missing history'
     convention as liquidity_growth_score (M8). A growth ratio above
@@ -45,7 +47,9 @@ def member_growth_signal(previous_count: int | None, current_count: int | None) 
         return 40.0, True
 
     pct_change = (current_count - previous_count) / previous_count
-    return max(0.0, min(100.0, 50.0 + pct_change * 200)), False  # steeper than liquidity's *50 -- % moves are naturally smaller here
+    return max(
+        0.0, min(100.0, 50.0 + pct_change * 200)
+    ), False  # steeper than liquidity's *50 -- % moves are naturally smaller here
 
 
 @dataclass
@@ -54,7 +58,9 @@ class SocialBreakdown:
     activity: float
     member_growth: float
     possible_inorganic_growth: bool
-    weights: dict = field(default_factory=lambda: {"member_size": 0.4, "activity": 0.35, "member_growth": 0.25})
+    weights: dict = field(
+        default_factory=lambda: {"member_size": 0.4, "activity": 0.35, "member_growth": 0.25}
+    )
 
     @property
     def composite(self) -> int:
@@ -67,9 +73,15 @@ class SocialBreakdown:
 
     def to_dict(self) -> dict:
         return {
-            "member_size": {"score": round(self.member_size, 2), "weight": self.weights["member_size"]},
+            "member_size": {
+                "score": round(self.member_size, 2),
+                "weight": self.weights["member_size"],
+            },
             "activity": {"score": round(self.activity, 2), "weight": self.weights["activity"]},
-            "member_growth": {"score": round(self.member_growth, 2), "weight": self.weights["member_growth"]},
+            "member_growth": {
+                "score": round(self.member_growth, 2),
+                "weight": self.weights["member_growth"],
+            },
             "possible_inorganic_growth": self.possible_inorganic_growth,
             "composite": self.composite,
         }

@@ -7,13 +7,15 @@ from app.wallets.holder_aggregator import aggregate_net_balances, rank_top_holde
 
 
 def _transfer(from_addr: str, to_addr: str, value: str, decimals: str = "18") -> EtherscanTransfer:
-    return EtherscanTransfer(**{"from": from_addr, "to": to_addr, "value": value, "tokenDecimal": decimals})
+    return EtherscanTransfer(
+        **{"from": from_addr, "to": to_addr, "value": value, "tokenDecimal": decimals}
+    )
 
 
 def test_aggregate_nets_incoming_and_outgoing():
     transfers = [
-        _transfer("0xmint", "0xalice", "1000000000000000000000"),   # +1000 to alice
-        _transfer("0xalice", "0xbob", "400000000000000000000"),      # -400 alice, +400 bob
+        _transfer("0xmint", "0xalice", "1000000000000000000000"),  # +1000 to alice
+        _transfer("0xalice", "0xbob", "400000000000000000000"),  # -400 alice, +400 bob
     ]
     balances = aggregate_net_balances(transfers)
     assert balances["0xalice"] == Decimal("600")
@@ -21,7 +23,9 @@ def test_aggregate_nets_incoming_and_outgoing():
 
 
 def test_aggregate_excludes_mint_and_burn_addresses():
-    transfers = [_transfer("0x0000000000000000000000000000000000000000", "0xalice", "500000000000000000000")]
+    transfers = [
+        _transfer("0x0000000000000000000000000000000000000000", "0xalice", "500000000000000000000")
+    ]
     balances = aggregate_net_balances(transfers)
     assert "0x0000000000000000000000000000000000000000" not in balances
     assert balances["0xalice"] == Decimal("500")

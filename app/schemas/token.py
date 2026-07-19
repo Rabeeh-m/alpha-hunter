@@ -17,6 +17,7 @@ class TokenPage(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
 class TokenCreate(BaseModel):
     chain: Chain
     contract_address: str
@@ -33,6 +34,7 @@ class TokenCreate(BaseModel):
     telegram_url: str | None = None
     twitter_handle: str | None = None
     github_url: str | None = None
+
 
 class TokenRead(BaseModel):
     id: UUID
@@ -65,8 +67,11 @@ class TokenRead(BaseModel):
         is a related AlphaScore object, not the Decimal this schema expects."""
         data = {c.name: getattr(token, c.name) for c in Token.__table__.columns}
         data["alpha_score"] = token.alpha_score.score if token.alpha_score else None
-        data["alpha_score_breakdown"] = token.alpha_score.factor_breakdown if token.alpha_score else None
+        data["alpha_score_breakdown"] = (
+            token.alpha_score.factor_breakdown if token.alpha_score else None
+        )
         return cls(**data)
+
 
 class TokenSnapshotRead(BaseModel):
     captured_at: datetime

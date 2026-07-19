@@ -33,7 +33,9 @@ class GoPlusClient:
         response.raise_for_status()
         return response.json()
 
-    async def get_token_security(self, chain: Chain, contract_address: str) -> GoPlusTokenSecurity | None:
+    async def get_token_security(
+        self, chain: Chain, contract_address: str
+    ) -> GoPlusTokenSecurity | None:
         chain_id = EVM_CHAIN_IDS.get(chain)
         if chain_id is None:
             raise ValueError(f"Contract security scanning not supported for chain '{chain.value}'")
@@ -44,12 +46,18 @@ class GoPlusClient:
             log.debug("goplus_cache_hit", chain=chain.value, address=contract_address)
             return GoPlusTokenSecurity.model_validate(cached) if cached else None
 
-        raw = await self._get(f"/token_security/{chain_id}", {"contract_addresses": contract_address})
+        raw = await self._get(
+            f"/token_security/{chain_id}", {"contract_addresses": contract_address}
+        )
         parsed = GoPlusResponse.model_validate(raw)
 
         result = parsed.result.get(contract_address.lower())
-        await cache_set(cache_key, result.model_dump() if result else {}, ttl_seconds=3600)  # security flags change slowly
-        log.info("goplus_fetched", chain=chain.value, address=contract_address, found=result is not None)
+        await cache_set(
+            cache_key, result.model_dump() if result else {}, ttl_seconds=3600
+        )  # security flags change slowly
+        log.info(
+            "goplus_fetched", chain=chain.value, address=contract_address, found=result is not None
+        )
         return result
 
     async def close(self) -> None:

@@ -35,7 +35,8 @@ class EtherscanClient:
     )
     async def _get(self, params: dict) -> dict:
         response = await self._client.get(
-            "", params={**params, "apikey": self._api_key.get_secret_value() if self._api_key else ""}
+            "",
+            params={**params, "apikey": self._api_key.get_secret_value() if self._api_key else ""},
         )
         response.raise_for_status()
         return response.json()
@@ -53,11 +54,17 @@ class EtherscanClient:
             log.debug("etherscan_cache_hit", chain=chain.value, address=contract_address)
             return [EtherscanTransfer.model_validate(t) for t in cached]
 
-        raw = await self._get({
-            "chainid": chain_id, "module": "account", "action": "tokentx",
-            "contractaddress": contract_address, "page": 1, "offset": limit,
-            "sort": "desc",
-        })
+        raw = await self._get(
+            {
+                "chainid": chain_id,
+                "module": "account",
+                "action": "tokentx",
+                "contractaddress": contract_address,
+                "page": 1,
+                "offset": limit,
+                "sort": "desc",
+            }
+        )
         results = raw.get("result", [])
         if not isinstance(results, list):
             # Etherscan returns {"status":"0","message":"No transactions found"}
@@ -66,7 +73,9 @@ class EtherscanClient:
             log.info("etherscan_no_transfers", chain=chain.value, address=contract_address)
             results = []
 
-        await cache_set(cache_key, results, ttl_seconds=300)  # 5min -- transfer history changes slower than price
+        await cache_set(
+            cache_key, results, ttl_seconds=300
+        )  # 5min -- transfer history changes slower than price
         return [EtherscanTransfer.model_validate(t) for t in results]
 
     async def close(self) -> None:

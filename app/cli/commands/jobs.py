@@ -33,7 +33,10 @@ async def _print_jobs() -> None:
     async with async_session_factory() as session:
         for job in job_registry.all():
             result = await session.execute(
-                select(JobRun).where(JobRun.job_id == job.id).order_by(JobRun.started_at.desc()).limit(1)
+                select(JobRun)
+                .where(JobRun.job_id == job.id)
+                .order_by(JobRun.started_at.desc())
+                .limit(1)
             )
             last_run = result.scalars().first()
             status_line = (
@@ -55,4 +58,6 @@ def run_job(job_id: str) -> None:
         raise typer.Exit(code=1)
 
     asyncio.run(execute_job(job))
-    typer.secho(f"Triggered '{job_id}' -- check 'jobs list' or /health/jobs for the result.", fg="green")
+    typer.secho(
+        f"Triggered '{job_id}' -- check 'jobs list' or /health/jobs for the result.", fg="green"
+    )

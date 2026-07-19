@@ -1,14 +1,12 @@
 from __future__ import annotations
 
+import tempfile
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime
 from decimal import Decimal
 from uuid import uuid4
 
-import httpx
 import pytest
-import respx
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -17,8 +15,6 @@ from app.core.database import Base, get_db
 from app.models.chain import Chain
 from app.models.token import Token
 from app.repositories.token_repository import TokenRepository
-
-import tempfile
 
 _TMPDIR = tempfile.mkdtemp(prefix="alpha_hunter_edge_")
 URI = f"sqlite+aiosqlite:///{_TMPDIR}/edge.db"
@@ -79,13 +75,19 @@ def _build_client(session):
 # tokens.py
 # -----------------------------------------------------------------------
 
+
 @pytest.mark.usefixtures("app_env")
 async def test_tokens_list_returns_page(db):
     repo = TokenRepository(db)
-    token = await repo.add(Token(
-        chain=Chain.BASE, contract_address="0xpage1", name="Page Token", symbol="PAGE",
-        volume_24h_usd=Decimal("1000"),
-    ))
+    await repo.add(
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xpage1",
+            name="Page Token",
+            symbol="PAGE",
+            volume_24h_usd=Decimal("1000"),
+        )
+    )
     await db.flush()
 
     _, client = _build_client(db)
@@ -117,9 +119,6 @@ async def test_tokens_get_returns_404(db):
     assert resp.status_code == 404
 
 
-
-
-
 @pytest.mark.usefixtures("app_env")
 async def test_tokens_snapshots_returns_404(db):
     _, client = _build_client(db)
@@ -132,9 +131,14 @@ async def test_tokens_snapshots_returns_404(db):
 @pytest.mark.usefixtures("app_env")
 async def test_tokens_snapshots_returns_empty_list(db):
     repo = TokenRepository(db)
-    token = await repo.add(Token(
-        chain=Chain.BASE, contract_address="0xsnp1", name="Snap Token", symbol="SNP",
-    ))
+    token = await repo.add(
+        Token(
+            chain=Chain.BASE,
+            contract_address="0xsnp1",
+            name="Snap Token",
+            symbol="SNP",
+        )
+    )
     await db.flush()
 
     _, client = _build_client(db)
@@ -148,12 +152,15 @@ async def test_tokens_snapshots_returns_empty_list(db):
 # jobs.py
 # -----------------------------------------------------------------------
 
+
 @pytest.fixture
 def with_jobs():
     from app.scheduler.scheduler import register_jobs
+
     register_jobs()
     yield
     from app.scheduler.registry import job_registry
+
     job_registry._jobs.clear()
 
 
@@ -249,6 +256,7 @@ async def test_jobs_resume_catches_job_lookup_error(db, with_jobs):
 # wallets.py — uncovered lines 71, 78 (empty results)
 # -----------------------------------------------------------------------
 
+
 @pytest.mark.usefixtures("app_env")
 async def test_wallets_whale_events_returns_empty_for_nonexistent_token(db):
     _, client = _build_client(db)
@@ -262,6 +270,7 @@ async def test_wallets_whale_events_returns_empty_for_nonexistent_token(db):
 # -----------------------------------------------------------------------
 # health.py
 # -----------------------------------------------------------------------
+
 
 @pytest.mark.usefixtures("app_env")
 async def test_health_scheduler(db):

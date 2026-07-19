@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import get_settings
-from app.core.logging import configure_logging, get_logger
 from app.api.health import router as health_router
 from app.api.v1 import api_router
+from app.core.config import get_settings
+from app.core.logging import configure_logging, get_logger
 from app.scheduler.scheduler import shutdown_scheduler, start_scheduler
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ log = get_logger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> "AsyncGenerator[None]":
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     settings = get_settings()
     log.info("app_startup", app_name=settings.app_name, environment=settings.environment.value)
     start_scheduler()

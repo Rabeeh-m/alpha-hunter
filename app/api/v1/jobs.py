@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from datetime import datetime
 
+from apscheduler.jobstores.base import JobLookupError
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
-from apscheduler.jobstores.base import JobLookupError
 
 from app.scheduler.execution import trigger_job_now
 from app.scheduler.registry import JobDefinition, job_registry
@@ -45,7 +45,7 @@ def _to_summary(job: JobDefinition) -> JobSummary:
         last_run_at=job.stats.last_run_at,
         last_duration_ms=job.stats.last_duration_ms,
         last_status=job.stats.last_status,
-        next_run_at=getattr(ap_job, 'next_run_time', None) if ap_job else None,
+        next_run_at=getattr(ap_job, "next_run_time", None) if ap_job else None,
     )
 
 
@@ -74,10 +74,8 @@ async def pause_job(job_id: str) -> dict[str, str]:
     job = job_registry.get(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found")
-    try:
+    with suppress(JobLookupError):
         scheduler.pause_job(job_id)
-    except JobLookupError:
-        pass
     job.enabled = False
     return {"status": "paused", "job_id": job_id}
 
@@ -87,10 +85,8 @@ async def resume_job(job_id: str) -> dict[str, str]:
     job = job_registry.get(job_id)
     if job is None:
         raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found")
-    try:
+    with suppress(JobLookupError):
         scheduler.resume_job(job_id)
-    except JobLookupError:
-        pass
     job.enabled = True
     return {"status": "resumed", "job_id": job_id}
 

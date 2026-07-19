@@ -10,10 +10,14 @@ from app.models.chain import Chain
 from app.models.token import Token
 from app.repositories.contract_security_repository import ContractSecurityRepository
 from app.repositories.token_repository import TokenRepository
-from app.services.contract_security_service import ContractSecurityService, UnsupportedChainForSecurityScan
+from app.services.contract_security_service import (
+    ContractSecurityService,
+    UnsupportedChainForSecurityScan,
+)
 
 MOCK_RESPONSE = {
-    "code": 1, "message": "OK",
+    "code": 1,
+    "message": "OK",
     "result": {"0xsecure": {"is_open_source": "1", "is_honeypot": "0", "is_mintable": "0"}},
 }
 
@@ -21,7 +25,9 @@ MOCK_RESPONSE = {
 @pytest.fixture
 async def seeded_token(db_session: AsyncSession) -> Token:
     repo = TokenRepository(db_session)
-    return await repo.add(Token(chain=Chain.BASE, contract_address="0xsecure", name="Secure Coin", symbol="SEC"))
+    return await repo.add(
+        Token(chain=Chain.BASE, contract_address="0xsecure", name="Secure Coin", symbol="SEC")
+    )
 
 
 @respx.mock
@@ -45,7 +51,9 @@ async def test_scan_token_persists_safety_score(db_session, seeded_token):
 
 async def test_scan_token_raises_for_unsupported_chain(db_session):
     token_repo = TokenRepository(db_session)
-    solana_token = await token_repo.add(Token(chain=Chain.SOLANA, contract_address="sol999", name="Sol", symbol="SOL"))
+    solana_token = await token_repo.add(
+        Token(chain=Chain.SOLANA, contract_address="sol999", name="Sol", symbol="SOL")
+    )
 
     client = GoPlusClient()
     repo = ContractSecurityRepository(db_session)

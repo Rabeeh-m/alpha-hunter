@@ -37,10 +37,16 @@ class WhaleEvent(Base):
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     token_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("tokens.id", ondelete="CASCADE"), nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("tokens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     wallet_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("wallets.id", ondelete="CASCADE"), nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("wallets.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
 
     event_type: Mapped[WhaleEventType] = mapped_column(
@@ -58,8 +64,8 @@ class WhaleEvent(Base):
     # lazy="joined" -- the whale feed ALWAYS needs token+wallet info
     # alongside the event itself (see WhaleEventRead.from_event); this
     # is the "N+1 vs. one extra join" trade-off from M8, same call here.
-    token: Mapped["Token"] = relationship(lazy="joined")
-    wallet: Mapped["Wallet"] = relationship(lazy="joined")
+    token: Mapped[Token] = relationship(lazy="joined")
+    wallet: Mapped[Wallet] = relationship(lazy="joined")
 
     def __repr__(self) -> str:
         return f"<WhaleEvent {self.event_type} token={self.token_id} wallet={self.wallet_id}>"

@@ -3,7 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from app.models.whale_event import WhaleEventType
-from app.wallets.whale_detection import MIN_NEW_POSITION_USD, classify_balance_change
+from app.wallets.whale_detection import classify_balance_change
 
 
 def test_new_position_above_threshold_detected():
@@ -34,7 +34,9 @@ def test_decrease_above_both_thresholds_detected():
 def test_small_pct_change_on_large_balance_ignored_if_usd_high_but_pct_low():
     # 5% change on a huge balance -- fails the 15% pct bar even though
     # the USD delta is large. Both thresholds must be met.
-    detection = classify_balance_change(Decimal("1000000"), Decimal("1050000"), price_usd=Decimal("1"))
+    detection = classify_balance_change(
+        Decimal("1000000"), Decimal("1050000"), price_usd=Decimal("1")
+    )
     assert detection is None
 
 

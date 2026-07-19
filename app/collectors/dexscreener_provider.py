@@ -30,6 +30,6 @@ class DexScreenerProvider:
                 tokens.append(token)
         log.info("dexscreener_provider_fetched", count=len(tokens))
         return tokens
-    
+
     async def close(self) -> None:
         await self._client.close()

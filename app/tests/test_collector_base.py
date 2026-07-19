@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import asyncio
 
-import pytest
-
 from app.collectors.base import TokenProvider
 from app.schemas.token import TokenCreate
 

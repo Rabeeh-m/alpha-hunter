@@ -8,7 +8,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 from app.core.cache import cache_get, cache_set
 from app.core.config import get_settings
 from app.core.logging import get_logger
-from app.schemas.github import GitHubRelease, GitHubRepo
+from app.schemas.github import GitHubRepo
 
 log = get_logger(__name__)
 
@@ -35,7 +35,9 @@ class GitHubClient:
         headers = {"Accept": "application/vnd.github+json"}
         if settings.github_token:
             headers["Authorization"] = f"Bearer {settings.github_token.get_secret_value()}"
-        self._client = http_client or httpx.AsyncClient(base_url=BASE_URL, headers=headers, timeout=10.0)
+        self._client = http_client or httpx.AsyncClient(
+            base_url=BASE_URL, headers=headers, timeout=10.0
+        )
 
     @retry(
         stop=stop_after_attempt(2),
@@ -71,7 +73,9 @@ class GitHubClient:
         if cached is not None:
             return cached
 
-        response = await self._get(f"/repos/{owner}/{repo}/contributors", params={"per_page": 100, "anon": "false"})
+        response = await self._get(
+            f"/repos/{owner}/{repo}/contributors", params={"per_page": 100, "anon": "false"}
+        )
         if response.status_code != 200:
             return 0
         count = len(response.json())

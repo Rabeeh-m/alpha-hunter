@@ -13,15 +13,22 @@ class DeveloperActivityRepository(BaseRepository[DeveloperActivity]):
     model = DeveloperActivity
 
     async def get_by_token_id(self, token_id: UUID) -> DeveloperActivity | None:
-        result = await self.session.execute(select(DeveloperActivity).where(DeveloperActivity.token_id == token_id))
+        result = await self.session.execute(
+            select(DeveloperActivity).where(DeveloperActivity.token_id == token_id)
+        )
         return result.scalar_one_or_none()
 
     async def upsert(self, token_id: UUID, result: DeveloperActivityResult) -> DeveloperActivity:
         existing = await self.get_by_token_id(token_id)
         fields = {
-            "score": result.score, "flags": result.flags, "stars": result.stars, "forks": result.forks,
-            "contributors_count": result.contributors_count, "last_commit_at": result.last_commit_at,
-            "is_fork": result.is_fork, "is_archived": result.is_archived,
+            "score": result.score,
+            "flags": result.flags,
+            "stars": result.stars,
+            "forks": result.forks,
+            "contributors_count": result.contributors_count,
+            "last_commit_at": result.last_commit_at,
+            "is_fork": result.is_fork,
+            "is_archived": result.is_archived,
         }
         if existing is not None:
             for key, value in fields.items():

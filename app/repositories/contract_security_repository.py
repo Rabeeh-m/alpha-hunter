@@ -21,10 +21,14 @@ class ContractSecurityRepository(BaseRepository[ContractSecurity]):
     async def upsert(self, token_id: UUID, risk: ContractRiskResult) -> ContractSecurity:
         existing = await self.get_by_token_id(token_id)
         fields = {
-            "safety_score": risk.safety_score, "flags": risk.flags,
-            "is_honeypot": risk.is_honeypot, "is_mintable": risk.is_mintable,
-            "is_open_source": risk.is_open_source, "buy_tax": risk.buy_tax,
-            "sell_tax": risk.sell_tax, "owner_address": risk.owner_address,
+            "safety_score": risk.safety_score,
+            "flags": risk.flags,
+            "is_honeypot": risk.is_honeypot,
+            "is_mintable": risk.is_mintable,
+            "is_open_source": risk.is_open_source,
+            "buy_tax": risk.buy_tax,
+            "sell_tax": risk.sell_tax,
+            "owner_address": risk.owner_address,
         }
         if existing is not None:
             for key, value in fields.items():

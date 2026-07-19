@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -14,9 +13,6 @@ from app.models.chain import Chain
 from app.repositories.token_repository import TokenRepository
 from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.schemas.token import TokenPage, TokenRead, TokenSnapshotRead
-
-if TYPE_CHECKING:
-    pass
 
 router = APIRouter(prefix="/tokens", tags=["tokens"])
 
@@ -45,9 +41,14 @@ async def list_tokens(
     repo = TokenRepository(db)
     try:
         tokens, total = await repo.search(
-            search=search, chain=chain, min_liquidity=min_liquidity,
-            min_volume=min_volume, created_within_hours=created_within_hours,
-            sort=sort, page=page, page_size=page_size,
+            search=search,
+            chain=chain,
+            min_liquidity=min_liquidity,
+            min_volume=min_volume,
+            created_within_hours=created_within_hours,
+            sort=sort,
+            page=page,
+            page_size=page_size,
         )
     except InvalidSortField as exc:
         raise HTTPException(status_code=400, detail=exc.to_dict()) from exc
@@ -56,7 +57,10 @@ async def list_tokens(
 
     return TokenPage(
         items=[TokenRead.from_token(t) for t in tokens],
-        page=page, page_size=page_size, total=total, total_pages=total_pages,
+        page=page,
+        page_size=page_size,
+        total=total,
+        total_pages=total_pages,
     )
 
 

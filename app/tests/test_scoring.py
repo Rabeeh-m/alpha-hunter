@@ -1,11 +1,19 @@
 from __future__ import annotations
-import pytest
+
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from app.ranking.scoring import age_score, liquidity_growth_score, liquidity_score, market_cap_score
-from app.ranking.scoring import contract_safety_score
-from app.ranking.scoring import social_signal_score
-from app.ranking.scoring import developer_activity_score
+
+import pytest
+
+from app.ranking.scoring import (
+    age_score,
+    contract_safety_score,
+    developer_activity_score,
+    liquidity_growth_score,
+    liquidity_score,
+    market_cap_score,
+    social_signal_score,
+)
 
 
 def test_liquidity_score_clips_below_floor():
@@ -57,7 +65,7 @@ def test_market_cap_score_penalizes_size_v1_simplification():
     higher for now, even though that's not quite right for a discovery
     tool. See the docstring on market_cap_score() for the plan to fix this."""
     assert market_cap_score(Decimal("40000000")) > market_cap_score(Decimal("500000"))
-    
+
 
 def test_contract_safety_score_passes_through_directly():
     assert contract_safety_score(85) == 85.0
@@ -69,8 +77,9 @@ def test_contract_safety_score_none_is_neutral():
 
 def test_weights_still_sum_to_one():
     from app.ranking.scoring import WEIGHTS
+
     assert abs(sum(WEIGHTS.values()) - 1.0) < 0.0001
-    
+
 
 def test_social_signal_score_none_is_neutral():
     assert social_signal_score(None, possible_inorganic_growth=False) == 50.0
@@ -94,4 +103,7 @@ def test_developer_activity_score_passes_through():
 
 def test_weights_still_sum_to_one():
     from app.ranking.scoring import WEIGHTS
-    assert abs(sum(WEIGHTS.values()) - 1.0) < 0.0001  # 8-factor version -- supersedes M17's 7-factor copy, delete that one
+
+    assert (
+        abs(sum(WEIGHTS.values()) - 1.0) < 0.0001
+    )  # 8-factor version -- supersedes M17's 7-factor copy, delete that one

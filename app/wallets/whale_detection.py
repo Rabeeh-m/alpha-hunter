@@ -35,7 +35,9 @@ def classify_balance_change(
         change_usd = (new_balance * price_usd) if price_usd is not None else None
         if change_usd is not None and change_usd < MIN_NEW_POSITION_USD:
             return None
-        return WhaleEventDetection(event_type=WhaleEventType.NEW_POSITION, change_pct=None, change_usd=change_usd)
+        return WhaleEventDetection(
+            event_type=WhaleEventType.NEW_POSITION, change_pct=None, change_usd=change_usd
+        )
 
     if price_usd is None:
         return None  # can't evaluate the USD threshold without a price

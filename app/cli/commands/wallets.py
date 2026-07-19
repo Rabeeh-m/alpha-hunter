@@ -11,7 +11,10 @@ from app.core.logging import configure_logging
 from app.repositories.token_repository import TokenRepository
 from app.repositories.wallet_holding_repository import WalletHoldingRepository
 from app.repositories.wallet_repository import WalletRepository
-from app.services.wallet_discovery_service import UnsupportedChainForWalletScan, WalletDiscoveryService
+from app.services.wallet_discovery_service import (
+    UnsupportedChainForWalletScan,
+    WalletDiscoveryService,
+)
 
 wallets_app = typer.Typer(help="On-demand wallet/holder scanning.")
 

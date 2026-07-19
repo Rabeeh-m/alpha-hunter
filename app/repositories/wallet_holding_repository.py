@@ -31,7 +31,9 @@ class WalletHoldingRepository(BaseRepository[WalletHolding]):
             await self.session.flush()
             return existing, previous_balance
 
-        holding = WalletHolding(token_id=token_id, wallet_id=wallet_id, approximate_balance=balance, rank=rank)
+        holding = WalletHolding(
+            token_id=token_id, wallet_id=wallet_id, approximate_balance=balance, rank=rank
+        )
         return await self.add(holding), None
 
     async def list_for_token(self, token_id: UUID, limit: int = 20) -> list[WalletHolding]:

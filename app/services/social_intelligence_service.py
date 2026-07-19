@@ -6,7 +6,12 @@ from app.core.logging import get_logger
 from app.models.token import Token
 from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository
-from app.social.scoring import SocialBreakdown, activity_score, member_growth_signal, member_size_score
+from app.social.scoring import (
+    SocialBreakdown,
+    activity_score,
+    member_growth_signal,
+    member_size_score,
+)
 
 log = get_logger(__name__)
 
@@ -36,7 +41,8 @@ class SocialIntelligenceService:
     async def scan_token(self, token: Token) -> int:
         if not token.telegram_url:
             raise NoTelegramLinkAvailable(
-                f"Token '{token.symbol}' has no known Telegram link", details={"token_id": str(token.id)}
+                f"Token '{token.symbol}' has no known Telegram link",
+                details={"token_id": str(token.id)},
             )
 
         previous = await self._snapshot_repo.get_latest_for_token(token.id)
@@ -60,10 +66,16 @@ class SocialIntelligenceService:
             possible_inorganic_growth=inorganic_flag,
         )
 
-        await self._score_repo.upsert(token.id, breakdown.composite, breakdown.to_dict(), inorganic_flag)
+        await self._score_repo.upsert(
+            token.id, breakdown.composite, breakdown.to_dict(), inorganic_flag
+        )
 
         log.info(
-            "social_scan_complete", token_id=str(token.id), symbol=token.symbol,
-            member_count=member_count, score=breakdown.composite, inorganic_flag=inorganic_flag,
+            "social_scan_complete",
+            token_id=str(token.id),
+            symbol=token.symbol,
+            member_count=member_count,
+            score=breakdown.composite,
+            inorganic_flag=inorganic_flag,
         )
         return breakdown.composite

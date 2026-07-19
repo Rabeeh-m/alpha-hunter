@@ -9,7 +9,6 @@ import respx
 from app.collectors.dexscreener_client import DexScreenerClient
 from app.collectors.dexscreener_provider import DexScreenerProvider
 
-
 MOCK_PROFILE = {"chainId": "base", "tokenAddress": "0xabc", "links": []}
 MOCK_PAIR = {
     "chainId": "base",
@@ -106,7 +105,8 @@ async def test_fetch_skips_unsupported_chain_pairs(http_client, mock_cache):
 @respx.mock
 async def test_fetch_includes_social_links_from_profile(http_client, mock_cache):
     profile_with_links = {
-        "chainId": "base", "tokenAddress": "0xabc",
+        "chainId": "base",
+        "tokenAddress": "0xabc",
         "links": [
             {"type": "telegram", "url": "https://t.me/test"},
             {"type": "twitter", "url": "https://x.com/test"},

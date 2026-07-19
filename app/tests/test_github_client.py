@@ -42,11 +42,17 @@ class TestGitHubClient:
     @respx.mock
     async def test_get_repo_parses_response(self, http_client, mock_cache):
         respx.get("https://api.github.com/repos/owner/repo").mock(
-            return_value=httpx.Response(200, json={
-                "stargazers_count": 42, "forks_count": 7,
-                "open_issues_count": 2, "fork": False,
-                "archived": False, "pushed_at": None,
-            })
+            return_value=httpx.Response(
+                200,
+                json={
+                    "stargazers_count": 42,
+                    "forks_count": 7,
+                    "open_issues_count": 2,
+                    "fork": False,
+                    "archived": False,
+                    "pushed_at": None,
+                },
+            )
         )
         client = GitHubClient(http_client=http_client)
         repo = await client.get_repo("owner", "repo")
@@ -57,36 +63,32 @@ class TestGitHubClient:
 
     @respx.mock
     async def test_get_repo_returns_none_on_404(self, http_client, mock_cache):
-        respx.get("https://api.github.com/repos/owner/repo").mock(
-            return_value=httpx.Response(404)
-        )
+        respx.get("https://api.github.com/repos/owner/repo").mock(return_value=httpx.Response(404))
         client = GitHubClient(http_client=http_client)
         repo = await client.get_repo("owner", "repo")
         assert repo is None
 
     @respx.mock
     async def test_get_repo_raises_on_other_http_error(self, http_client, mock_cache):
-        respx.get("https://api.github.com/repos/owner/repo").mock(
-            return_value=httpx.Response(403)
-        )
+        respx.get("https://api.github.com/repos/owner/repo").mock(return_value=httpx.Response(403))
         client = GitHubClient(http_client=http_client)
         with pytest.raises(httpx.HTTPStatusError):
             await client.get_repo("owner", "repo")
 
     @respx.mock
     async def test_get_contributor_count_estimate(self, http_client, mock_cache):
-        respx.get("https://api.github.com/repos/owner/repo/contributors?per_page=100&anon=false").mock(
-            return_value=httpx.Response(200, json=[{}, {}, {}])
-        )
+        respx.get(
+            "https://api.github.com/repos/owner/repo/contributors?per_page=100&anon=false"
+        ).mock(return_value=httpx.Response(200, json=[{}, {}, {}]))
         client = GitHubClient(http_client=http_client)
         count = await client.get_contributor_count_estimate("owner", "repo")
         assert count == 3
 
     @respx.mock
     async def test_get_contributor_count_returns_zero_on_non_200(self, http_client, mock_cache):
-        respx.get("https://api.github.com/repos/owner/repo/contributors?per_page=100&anon=false").mock(
-            return_value=httpx.Response(403)
-        )
+        respx.get(
+            "https://api.github.com/repos/owner/repo/contributors?per_page=100&anon=false"
+        ).mock(return_value=httpx.Response(403))
         client = GitHubClient(http_client=http_client)
         count = await client.get_contributor_count_estimate("owner", "repo")
         assert count == 0
@@ -118,7 +120,9 @@ class TestGitHubClient:
             call_count += 1
             if call_count < 2:
                 raise httpx.TransportError("connection reset")
-            return httpx.Response(200, json={"stargazers_count": 1, "forks_count": 0, "open_issues_count": 0})
+            return httpx.Response(
+                200, json={"stargazers_count": 1, "forks_count": 0, "open_issues_count": 0}
+            )
 
         respx.get("https://api.github.com/repos/owner/repo").mock(side_effect=_handler)
         client = GitHubClient(http_client=http_client)

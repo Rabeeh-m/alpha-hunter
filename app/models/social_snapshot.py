@@ -20,7 +20,10 @@ class TokenSocialSnapshot(Base):
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     token_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("tokens.id", ondelete="CASCADE"), nullable=False, index=True
+        PGUUID(as_uuid=True),
+        ForeignKey("tokens.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     member_count: Mapped[int | None] = mapped_column(nullable=True)
     message_count_24h: Mapped[int | None] = mapped_column(nullable=True)

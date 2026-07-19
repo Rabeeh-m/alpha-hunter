@@ -3,8 +3,6 @@ from __future__ import annotations
 from decimal import Decimal
 from unittest.mock import AsyncMock
 
-import pytest
-
 from app.models.chain import Chain
 from app.schemas.token import TokenCreate
 from app.services.token_ingestion_service import TokenIngestionService

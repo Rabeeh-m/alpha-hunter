@@ -11,7 +11,10 @@ from app.repositories.social_score_repository import SocialScoreRepository
 from app.repositories.social_snapshot_repository import SocialSnapshotRepository
 from app.repositories.token_repository import TokenRepository
 from app.schemas.social import SocialScoreRead
-from app.services.social_intelligence_service import NoTelegramLinkAvailable, SocialIntelligenceService
+from app.services.social_intelligence_service import (
+    NoTelegramLinkAvailable,
+    SocialIntelligenceService,
+)
 
 router = APIRouter(prefix="/tokens/{token_id}/social", tags=["social"])
 
@@ -21,7 +24,9 @@ async def get_token_social(token_id: UUID, db: AsyncSession = Depends(get_db)) -
     repo = SocialScoreRepository(db)
     record = await repo.get_by_token_id(token_id)
     if record is None:
-        raise HTTPException(status_code=404, detail="No social scan yet -- call POST .../social/scan first")
+        raise HTTPException(
+            status_code=404, detail="No social scan yet -- call POST .../social/scan first"
+        )
     return SocialScoreRead.model_validate(record)
 
 

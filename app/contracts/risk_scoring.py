@@ -14,13 +14,13 @@ _DEDUCTIONS: dict[str, int] = {
     "is_honeypot": 95,
     "can_take_back_ownership": 25,
     "hidden_owner": 20,
-    "is_mintable_unrenounced": 25,   # composite flag, see below
+    "is_mintable_unrenounced": 25,  # composite flag, see below
     "selfdestruct": 15,
     "transfer_pausable": 12,
-    "is_blacklisted": 10,             # contract HAS a blacklist function (not that this token IS blacklisted)
+    "is_blacklisted": 10,  # contract HAS a blacklist function (not that this token IS blacklisted)
     "not_open_source": 20,
-    "high_tax": 15,                    # buy or sell tax > 10%
-    "very_high_tax": 30,                # buy or sell tax > 25% (replaces high_tax, not additive)
+    "high_tax": 15,  # buy or sell tax > 10%
+    "very_high_tax": 30,  # buy or sell tax > 25% (replaces high_tax, not additive)
 }
 
 TAX_HIGH_THRESHOLD = Decimal("0.10")
@@ -66,7 +66,9 @@ def compute_contract_risk(security: GoPlusTokenSecurity | None) -> ContractRiskR
     evidence of either safety or danger.
     """
     if security is None:
-        return ContractRiskResult(safety_score=50, flags=["No security data available yet from GoPlus"])
+        return ContractRiskResult(
+            safety_score=50, flags=["No security data available yet from GoPlus"]
+        )
 
     score = 100
     flags: list[str] = []
@@ -86,7 +88,8 @@ def compute_contract_risk(security: GoPlusTokenSecurity | None) -> ContractRiskR
 
     is_mintable = _is_true(security.is_mintable)
     owner_renounced = security.owner_address in (
-        "0x0000000000000000000000000000000000000000", None,
+        "0x0000000000000000000000000000000000000000",
+        None,
     )
     if is_mintable and not owner_renounced:
         score -= _DEDUCTIONS["is_mintable_unrenounced"]
@@ -106,7 +109,9 @@ def compute_contract_risk(security: GoPlusTokenSecurity | None) -> ContractRiskR
         score -= _DEDUCTIONS["is_blacklisted"]
         flags.append("Contract has blacklist functionality")
 
-    is_open_source = _is_true(security.is_open_source) if security.is_open_source is not None else True
+    is_open_source = (
+        _is_true(security.is_open_source) if security.is_open_source is not None else True
+    )
     if not is_open_source:
         score -= _DEDUCTIONS["not_open_source"]
         flags.append("Contract source is not verified/open source")
@@ -126,7 +131,12 @@ def compute_contract_risk(security: GoPlusTokenSecurity | None) -> ContractRiskR
         flags.append("No significant risk flags detected")
 
     return ContractRiskResult(
-        safety_score=max(0, score), flags=flags, buy_tax=buy_tax, sell_tax=sell_tax,
-        is_honeypot=is_honeypot, is_mintable=is_mintable, is_open_source=is_open_source,
+        safety_score=max(0, score),
+        flags=flags,
+        buy_tax=buy_tax,
+        sell_tax=sell_tax,
+        is_honeypot=is_honeypot,
+        is_mintable=is_mintable,
+        is_open_source=is_open_source,
         owner_address=security.owner_address,
     )

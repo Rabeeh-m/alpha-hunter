@@ -31,7 +31,9 @@ async def test_get_recent_transfers_parses_successful_response(http_client):
         {"from": "0xreceiver", "to": "0xthird", "value": "2000000000000000000"},
     ]
     respx.get(url__startswith=BASE).mock(
-        return_value=httpx.Response(200, json={"status": "1", "message": "OK", "result": mock_result})
+        return_value=httpx.Response(
+            200, json={"status": "1", "message": "OK", "result": mock_result}
+        )
     )
 
     client = EtherscanClient(http_client=http_client)

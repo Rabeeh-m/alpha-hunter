@@ -39,10 +39,12 @@ class TestScanTopTokensForWhaleActivity:
         mock_factory, mock_session = mock_session_factory
         tokens = [_make_token("0xaaa"), _make_token("0xccc", Chain.ETHEREUM)]
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.EtherscanClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo, \
-             patch("app.scheduler.jobs.WalletDiscoveryService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.EtherscanClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+            patch("app.scheduler.jobs.WalletDiscoveryService") as MockService,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -62,10 +64,12 @@ class TestScanTopTokensForWhaleActivity:
         mock_factory, mock_session = mock_session_factory
         tokens = [_make_token("0xsol", Chain.SOLANA), _make_token("0xeth", Chain.ETHEREUM)]
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.EtherscanClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo, \
-             patch("app.scheduler.jobs.WalletDiscoveryService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.EtherscanClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+            patch("app.scheduler.jobs.WalletDiscoveryService") as MockService,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -84,9 +88,11 @@ class TestScanTopTokensForWhaleActivity:
     async def test_closes_client_on_error(self, mock_session_factory):
         mock_factory, _ = mock_session_factory
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.EtherscanClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.EtherscanClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -104,10 +110,12 @@ class TestScanTopTokensForSocialActivity:
         mock_factory, mock_session = mock_session_factory
         tokens = [_make_token("0xaaa"), _make_token("0xbbb")]
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.TelegramClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo, \
-             patch("app.scheduler.jobs.SocialIntelligenceService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.TelegramClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+            patch("app.scheduler.jobs.SocialIntelligenceService") as MockService,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -129,10 +137,12 @@ class TestScanTopTokensForSocialActivity:
 
         from app.services.social_intelligence_service import NoTelegramLinkAvailable
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.TelegramClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo, \
-             patch("app.scheduler.jobs.SocialIntelligenceService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.TelegramClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+            patch("app.scheduler.jobs.SocialIntelligenceService") as MockService,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -150,9 +160,11 @@ class TestScanTopTokensForSocialActivity:
     async def test_closes_client_on_error(self, mock_session_factory):
         mock_factory, _ = mock_session_factory
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.TelegramClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.TelegramClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -169,15 +181,20 @@ class TestClassifyUnclassifiedNarratives:
     async def test_calls_service_and_returns_result(self, mock_session_factory):
         mock_factory, mock_session = mock_session_factory
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.AnthropicClassifierClient") as MockClient, \
-             patch("app.scheduler.jobs.NarrativeRepository") as MockRepo, \
-             patch("app.scheduler.jobs.NarrativeClassificationService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.AnthropicClassifierClient") as MockClient,
+            patch("app.scheduler.jobs.NarrativeRepository") as MockRepo,
+            patch("app.scheduler.jobs.NarrativeClassificationService") as MockService,
+        ):
             MockClient.return_value = AsyncMock()
             repo_instance = AsyncMock()
             MockRepo.return_value = repo_instance
             service_instance = AsyncMock()
-            service_instance.classify_unclassified_batch.return_value = {"classified": 5, "errors": 0}
+            service_instance.classify_unclassified_batch.return_value = {
+                "classified": 5,
+                "errors": 0,
+            }
             MockService.return_value = service_instance
 
             result = await classify_unclassified_narratives()
@@ -188,15 +205,20 @@ class TestClassifyUnclassifiedNarratives:
     async def test_returns_empty_result_when_no_unclassified(self, mock_session_factory):
         mock_factory, mock_session = mock_session_factory
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.AnthropicClassifierClient") as MockClient, \
-             patch("app.scheduler.jobs.NarrativeRepository") as MockRepo, \
-             patch("app.scheduler.jobs.NarrativeClassificationService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.AnthropicClassifierClient") as MockClient,
+            patch("app.scheduler.jobs.NarrativeRepository") as MockRepo,
+            patch("app.scheduler.jobs.NarrativeClassificationService") as MockService,
+        ):
             MockClient.return_value = AsyncMock()
             repo_instance = AsyncMock()
             MockRepo.return_value = repo_instance
             service_instance = AsyncMock()
-            service_instance.classify_unclassified_batch.return_value = {"classified": 0, "errors": 0}
+            service_instance.classify_unclassified_batch.return_value = {
+                "classified": 0,
+                "errors": 0,
+            }
             MockService.return_value = service_instance
 
             result = await classify_unclassified_narratives()
@@ -210,10 +232,12 @@ class TestScanTopTokensForDeveloperActivity:
         mock_factory, mock_session = mock_session_factory
         tokens = [_make_token("0xaaa"), _make_token("0xbbb")]
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.GitHubClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo, \
-             patch("app.scheduler.jobs.DeveloperIntelligenceService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.GitHubClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+            patch("app.scheduler.jobs.DeveloperIntelligenceService") as MockService,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
@@ -235,17 +259,23 @@ class TestScanTopTokensForDeveloperActivity:
 
         from app.services.developer_intelligence_service import NoRepoLinkAvailable, RepoNotFound
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.GitHubClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo, \
-             patch("app.scheduler.jobs.DeveloperIntelligenceService") as MockService:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.GitHubClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+            patch("app.scheduler.jobs.DeveloperIntelligenceService") as MockService,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
             repo_instance.search.return_value = (tokens, len(tokens))
             MockTokenRepo.return_value = repo_instance
             service_instance = AsyncMock()
-            service_instance.scan_token.side_effect = [NoRepoLinkAvailable("0xaaa"), RepoNotFound("0xbbb"), None]
+            service_instance.scan_token.side_effect = [
+                NoRepoLinkAvailable("0xaaa"),
+                RepoNotFound("0xbbb"),
+                None,
+            ]
             MockService.return_value = service_instance
 
             result = await scan_top_tokens_for_developer_activity()
@@ -256,9 +286,11 @@ class TestScanTopTokensForDeveloperActivity:
     async def test_closes_client_on_error(self, mock_session_factory):
         mock_factory, _ = mock_session_factory
 
-        with patch("app.scheduler.jobs.async_session_factory", mock_factory), \
-             patch("app.scheduler.jobs.GitHubClient") as MockClient, \
-             patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo:
+        with (
+            patch("app.scheduler.jobs.async_session_factory", mock_factory),
+            patch("app.scheduler.jobs.GitHubClient") as MockClient,
+            patch("app.scheduler.jobs.TokenRepository") as MockTokenRepo,
+        ):
             mock_client_instance = AsyncMock()
             MockClient.return_value = mock_client_instance
             repo_instance = AsyncMock()
