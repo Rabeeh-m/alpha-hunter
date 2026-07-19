@@ -5,7 +5,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.logging import get_logger
 from app.scheduler.execution import execute_job
-from app.scheduler.jobs import compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_whale_activity, scan_top_tokens_for_social_activity, classify_unclassified_narratives
+from app.scheduler.jobs import classify_unclassified_narratives, compute_alpha_scores, refresh_dexscreener, refresh_geckoterminal, scan_top_tokens_for_developer_activity, scan_top_tokens_for_social_activity, scan_top_tokens_for_whale_activity
 from app.scheduler.registry import JobDefinition, job_registry
 
 log = get_logger(__name__)
@@ -63,6 +63,14 @@ def register_jobs() -> None:
             func=classify_unclassified_narratives,
             interval_seconds=600,  # 10min -- frequent enough to clear backlog steadily,
                                      # bounded batch size keeps per-run LLM cost predictable
+        ),
+        JobDefinition(
+            id="scan_top_tokens_for_developer_activity",
+            name="Developer Activity Scan (Top 10 Tokens)",
+            description="Scan top-ranked tokens' GitHub repos for recent dev activity",
+            category="developer",
+            func=scan_top_tokens_for_developer_activity,
+            interval_seconds=3600,  # 1h -- dev metrics change slowly
         ),
     ]
 

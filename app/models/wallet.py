@@ -43,6 +43,7 @@ class Wallet(Base):
     wallet_type: Mapped[WalletType] = mapped_column(
         SAEnum(WalletType, name="wallet_type_enum", create_type=False), default=WalletType.UNKNOWN, nullable=False
     )
+    label: Mapped[str | None] = mapped_column(String(128), nullable=True)
     # Confidence in the wallet_type tag, 0-100. NULL for UNKNOWN wallets
     # that have never been scanned into any ranking -- distinct from a
     # low-confidence 0, which would mean "we looked and found nothing

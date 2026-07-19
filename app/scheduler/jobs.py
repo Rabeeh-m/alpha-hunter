@@ -153,24 +153,24 @@ async def classify_unclassified_narratives() -> dict[str, int]:
         result = await service.classify_unclassified_batch(limit=NARRATIVE_CLASSIFICATION_BATCH_SIZE)
         await session.commit()
         return result
-    
-    
-    async def scan_top_tokens_for_developer_activity() -> dict[str, int]:
-        client = GitHubClient()
-        scanned, skipped = 0, 0
-        try:
-            async with async_session_factory() as session:
-                token_repo = TokenRepository(session)
-                tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_DEVELOPER_MONITORING)
-                repo = DeveloperActivityRepository(session)
-                service = DeveloperIntelligenceService(client, repo)
-                for token in tokens:
-                    try:
-                        await service.scan_token(token)
-                        scanned += 1
-                    except (NoRepoLinkAvailable, RepoNotFound):
-                        skipped += 1
-                await session.commit()
-        finally:
-            await client.close()
-        return {"tokens_scanned": scanned, "tokens_skipped": skipped}
+
+
+async def scan_top_tokens_for_developer_activity() -> dict[str, int]:
+    client = GitHubClient()
+    scanned, skipped = 0, 0
+    try:
+        async with async_session_factory() as session:
+            token_repo = TokenRepository(session)
+            tokens, _ = await token_repo.search(sort="-alpha_score", page=1, page_size=TOP_N_TOKENS_FOR_DEVELOPER_MONITORING)
+            repo = DeveloperActivityRepository(session)
+            service = DeveloperIntelligenceService(client, repo)
+            for token in tokens:
+                try:
+                    await service.scan_token(token)
+                    scanned += 1
+                except (NoRepoLinkAvailable, RepoNotFound):
+                    skipped += 1
+            await session.commit()
+    finally:
+        await client.close()
+    return {"tokens_scanned": scanned, "tokens_skipped": skipped}

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.collectors.etherscan_client import EtherscanClient
 from app.core.database import get_db
+from app.models.wallet import Wallet
 from app.repositories.token_repository import TokenRepository
 from app.repositories.wallet_holding_repository import WalletHoldingRepository
 from app.repositories.wallet_repository import WalletRepository
@@ -27,7 +28,7 @@ async def list_token_wallets(token_id: UUID, db: AsyncSession = Depends(get_db))
 
     results = []
     for holding in holdings:
-        wallet = await holding_repo.session.get(holding.__class__.wallet_id.property.mapper.class_, holding.wallet_id)
+        wallet = await db.get(Wallet, holding.wallet_id)
         results.append(
             WalletHoldingRead(
                 address=wallet.address, wallet_type=wallet.wallet_type,
@@ -51,7 +52,8 @@ async def scan_token_wallets(token_id: UUID, db: AsyncSession = Depends(get_db))
     try:
         wallet_repo = WalletRepository(db)
         holding_repo = WalletHoldingRepository(db)
-        service = WalletDiscoveryService(client, wallet_repo, holding_repo)
+        whale_event_repo = WhaleEventRepository(db)
+        service = WalletDiscoveryService(client, wallet_repo, holding_repo, whale_event_repo)
         count = await service.scan_token(token)
         await db.commit()
         return {"status": "complete", "holders_found": count}
