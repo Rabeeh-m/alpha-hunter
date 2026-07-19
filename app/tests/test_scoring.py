@@ -5,6 +5,8 @@ from decimal import Decimal
 from app.ranking.scoring import age_score, liquidity_growth_score, liquidity_score, market_cap_score
 from app.ranking.scoring import contract_safety_score
 from app.ranking.scoring import social_signal_score
+from app.ranking.scoring import developer_activity_score
+
 
 def test_liquidity_score_clips_below_floor():
     assert liquidity_score(Decimal("500")) == 0.0
@@ -82,6 +84,14 @@ def test_social_signal_score_halved_when_inorganic():
     assert social_signal_score(80, possible_inorganic_growth=True) == 40.0
 
 
+def test_developer_activity_score_none_is_neutral():
+    assert developer_activity_score(None) == 50.0
+
+
+def test_developer_activity_score_passes_through():
+    assert developer_activity_score(72) == 72.0
+
+
 def test_weights_still_sum_to_one():
     from app.ranking.scoring import WEIGHTS
-    assert abs(sum(WEIGHTS.values()) - 1.0) < 0.0001  # regenerated for the 7-factor set -- replaces the M14 version of this test, don't duplicate it
+    assert abs(sum(WEIGHTS.values()) - 1.0) < 0.0001  # 8-factor version -- supersedes M17's 7-factor copy, delete that one

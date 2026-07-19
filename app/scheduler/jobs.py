@@ -26,6 +26,8 @@ from app.repositories.social_score_repository import SocialScoreRepository
 from app.collectors.anthropic_client import AnthropicClassifierClient
 from app.repositories.narrative_repository import NarrativeRepository
 from app.services.narrative_classification_service import NarrativeClassificationService
+from app.repositories.developer_activity_repository import DeveloperActivityRepository
+
 
 NARRATIVE_CLASSIFICATION_BATCH_SIZE = 20
 TOP_N_TOKENS_FOR_SOCIAL_MONITORING = 10
@@ -67,8 +69,10 @@ async def compute_alpha_scores() -> dict[str, int]:
         alpha_score_repo = AlphaScoreRepository(session)
         contract_security_repo = ContractSecurityRepository(session)
         social_score_repo = SocialScoreRepository(session)
+        developer_activity_repo = DeveloperActivityRepository(session)
         service = RankingService(
-            token_repo, snapshot_repo, alpha_score_repo, contract_security_repo, social_score_repo
+            token_repo, snapshot_repo, alpha_score_repo, contract_security_repo,
+            social_score_repo, developer_activity_repo,
         )
         count = await service.compute_all()
         await session.commit()

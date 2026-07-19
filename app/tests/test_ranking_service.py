@@ -15,6 +15,7 @@ from app.repositories.contract_security_repository import ContractSecurityReposi
 from app.contracts.risk_scoring import compute_contract_risk
 from app.schemas.goplus import GoPlusTokenSecurity
 from app.repositories.social_score_repository import SocialScoreRepository
+from app.repositories.developer_activity_repository import DeveloperActivityRepository
 
 
 @pytest.fixture
@@ -34,7 +35,8 @@ async def test_compute_for_token_persists_score_and_breakdown(db_session, seeded
     alpha_repo = AlphaScoreRepository(db_session)
     contract_security_repo = ContractSecurityRepository(db_session)
     social_repo = SocialScoreRepository(db_session)
-    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo)
+    dev_repo = DeveloperActivityRepository(db_session)
+    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo, dev_repo)
     
     score = await service.compute_for_token(seeded_token)
     await db_session.flush()
@@ -56,7 +58,8 @@ async def test_compute_for_token_is_idempotent_upsert(db_session, seeded_token):
     alpha_repo = AlphaScoreRepository(db_session)
     contract_security_repo = ContractSecurityRepository(db_session)
     social_repo = SocialScoreRepository(db_session)
-    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo)
+    dev_repo = DeveloperActivityRepository(db_session)
+    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo, dev_repo)
     
     await service.compute_for_token(seeded_token)
     await db_session.refresh(seeded_token, ["alpha_score"])
@@ -76,7 +79,8 @@ async def test_honeypot_contract_drags_down_composite_score(db_session, seeded_t
     alpha_repo = AlphaScoreRepository(db_session)
     contract_security_repo = ContractSecurityRepository(db_session)
     social_repo = SocialScoreRepository(db_session)
-    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo)
+    dev_repo = DeveloperActivityRepository(db_session)
+    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo, dev_repo)
 
     # Baseline: no security scan yet -> neutral 50 contract_safety factor
     baseline_score = await service.compute_for_token(seeded_token)
@@ -97,7 +101,8 @@ async def test_inorganic_growth_flag_halves_social_contribution(db_session, seed
     alpha_repo = AlphaScoreRepository(db_session)
     contract_security_repo = ContractSecurityRepository(db_session)
     social_repo = SocialScoreRepository(db_session)
-    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo)
+    dev_repo = DeveloperActivityRepository(db_session)
+    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo, dev_repo)
 
     # Clean social score, no flag
     await social_repo.upsert(seeded_token.id, score=90, factor_breakdown={}, possible_inorganic_growth=False)
@@ -110,3 +115,24 @@ async def test_inorganic_growth_flag_halves_social_contribution(db_session, seed
     flagged_score = await service.compute_for_token(seeded_token)
 
     assert flagged_score < clean_score
+    
+
+async def test_developer_activity_none_defaults_to_neutral_without_crashing(db_session, seeded_token):
+    """A token with no developer scan at all (the common case per M19's
+    coverage note) must still produce a valid composite score, not
+    crash on a missing lookup."""
+    token_repo = TokenRepository(db_session)
+    snapshot_repo = TokenSnapshotRepository(db_session)
+    alpha_repo = AlphaScoreRepository(db_session)
+    contract_security_repo = ContractSecurityRepository(db_session)
+    social_repo = SocialScoreRepository(db_session)
+    dev_repo = DeveloperActivityRepository(db_session)
+    service = RankingService(token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_repo, dev_repo)
+
+    score = await service.compute_for_token(seeded_token)
+    await db_session.flush()
+    await db_session.refresh(seeded_token, ["alpha_score"])
+
+    assert 0 <= score <= 100
+    saved = await alpha_repo.get_by_id(seeded_token.alpha_score.id)
+    assert saved.factor_breakdown["developer_activity"]["score"] == 50.0

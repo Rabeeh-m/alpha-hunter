@@ -13,13 +13,14 @@ from decimal import Decimal
 # eventually learn weights from real historical outcomes instead of
 # these best-guess constants.
 WEIGHTS: dict[str, float] = {
-    "liquidity": 0.18,
-    "volume": 0.13,
-    "market_cap": 0.09,
-    "age": 0.09,
-    "liquidity_growth": 0.18,
-    "contract_safety": 0.23,
-    "social_signal": 0.10,
+    "liquidity": 0.16,
+    "volume": 0.12,
+    "market_cap": 0.08,
+    "age": 0.08,
+    "liquidity_growth": 0.16,
+    "contract_safety": 0.21,
+    "social_signal": 0.09,
+    "developer_activity": 0.10,
 }
 
 
@@ -90,6 +91,7 @@ class ScoreBreakdown:
     liquidity_growth: float
     contract_safety: float
     social_signal: float
+    developer_activity: float
 
     @property
     def composite(self) -> float:
@@ -136,3 +138,22 @@ def social_signal_score(social_score: int | None, possible_inorganic_growth: boo
     if possible_inorganic_growth:
         return social_score * 0.5
     return float(social_score)
+
+
+def developer_activity_score(score: int | None) -> float:
+    """Direct pass-through of DeveloperActivity.score (already 0-100
+    from M19), same shape as contract_safety_score (M14) and
+    social_signal_score (M17). None -- meaning EITHER never scanned OR
+    no repo link exists at all, indistinguishable at this layer, same
+    as every other *_score None-handling in this file -- returns
+    neutral 50.
+
+    Given most tokens will have no repo link (see M19's coverage
+    note), this factor will sit at 50 for the large majority of
+    tokens most of the time. That's expected and correct: absence of
+    developer activity data is not evidence the project lacks
+    developers -- plenty of legitimate projects don't publish a public
+    repo, or don't link it from DexScreener."""
+    if score is None:
+        return 50.0
+    return float(score)

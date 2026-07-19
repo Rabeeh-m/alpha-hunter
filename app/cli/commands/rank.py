@@ -12,12 +12,14 @@ from app.repositories.token_snapshot_repository import TokenSnapshotRepository
 from app.services.ranking_service import RankingService
 from app.repositories.contract_security_repository import ContractSecurityRepository
 from app.repositories.social_score_repository import SocialScoreRepository
+from app.repositories.developer_activity_repository import DeveloperActivityRepository
 
 
 def rank() -> None:
     """Run one alpha-scoring pass immediately, outside the scheduler."""
     configure_logging()
     asyncio.run(_run())
+
 
 
 async def _run() -> None:
@@ -27,8 +29,10 @@ async def _run() -> None:
         alpha_repo = AlphaScoreRepository(session)
         contract_security_repo = ContractSecurityRepository(session)
         social_score_repo = SocialScoreRepository(session)
+        developer_activity_repo = DeveloperActivityRepository(session)
         service = RankingService(
-            token_repo, snapshot_repo, alpha_repo, contract_security_repo, social_score_repo
+            token_repo, snapshot_repo, alpha_repo, contract_security_repo,
+            social_score_repo, developer_activity_repo,
         )
         count = await service.compute_all()
         await session.commit()

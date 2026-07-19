@@ -3,7 +3,7 @@ import type { AlphaFactorBreakdown } from "../../types/tokens";
 const LABELS: Record<string, string> = {
   liquidity: "Liquidity", volume: "24H Volume", market_cap: "Market Cap",
   age: "Freshness", liquidity_growth: "Liquidity Growth",
-  contract_safety: "Contract Safety", social_signal: "Social Signal",
+  contract_safety: "Contract Safety", social_signal: "Social Signal", developer_activity: "Developer Activity",
 };
 
 function barColor(score: number): string {

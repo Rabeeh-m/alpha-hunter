@@ -50,4 +50,5 @@ export interface AlphaFactorBreakdown {
   contract_safety: { score: number; weight: number };
   social_signal: { score: number; weight: number };
   composite: number;
+  developer_activity: { score: number; weight: number };
 }
