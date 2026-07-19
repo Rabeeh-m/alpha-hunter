@@ -1,19 +1,14 @@
 <div align="center">
 
-# 🎯 Alpha Hunter
+# Alpha Hunter
 
 **AI-Powered Crypto Intelligence Platform for Early-Stage Token Discovery**
 
-[![CI](https://img.shields.io/badge/CI-passing-brightgreen?logo=githubactions)](#)
 [![Python](https://img.shields.io/badge/python-3.13%2B-blue?logo=python)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi)](#)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql)](#)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](#)
 [![Docker](https://img.shields.io/badge/docker-ready-2496ED?logo=docker)](#)
-[![Ruff](https://img.shields.io/badge/lint-ruff-D7FF64)](#)
-[![Black](https://img.shields.io/badge/code%20style-black-000000)](#)
-[![mypy](https://img.shields.io/badge/type--checked-mypy-2A6DB2)](#)
-[![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](#)
-[![License](https://img.shields.io/badge/license-Proprietary-lightgrey)](#)
 
 *A transparent, explainable research tool — not a prediction engine, not financial advice.*
 
@@ -24,39 +19,22 @@
 ## Table of Contents
 
 1. [Project Overview](#1-project-overview)
-2. [Features](#2-features)
-3. [Screenshots](#3-screenshots)
-4. [High-Level Architecture](#4-high-level-architecture)
-5. [Technology Stack](#5-technology-stack)
-6. [Project Structure](#6-project-structure)
-7. [System Workflow](#7-system-workflow)
-8. [Data Flow](#8-data-flow)
-9. [Installation](#9-installation)
-10. [Local Development](#10-local-development)
-11. [Docker Deployment](#11-docker-deployment)
-12. [Environment Variables](#12-environment-variables)
-13. [Configuration](#13-configuration)
-14. [Database Design](#14-database-design)
-15. [REST API](#15-rest-api)
-16. [Scheduler](#16-scheduler)
-17. [Alpha Scoring](#17-alpha-scoring)
-18. [Logging](#18-logging)
-19. [Security](#19-security)
-20. [Performance](#20-performance)
-21. [Monitoring & Observability](#21-monitoring--observability)
-22. [Testing](#22-testing)
-23. [Code Quality](#23-code-quality)
-24. [CI/CD](#24-cicd)
-25. [Documentation Standards](#25-documentation-standards)
-26. [Roadmap](#26-roadmap)
-27. [Contributing](#27-contributing)
-28. [Troubleshooting](#28-troubleshooting)
-29. [Best Practices](#29-best-practices)
-30. [Production Deployment](#30-production-deployment)
-31. [Future Improvements](#31-future-improvements)
-32. [License](#32-license)
-33. [Acknowledgements](#33-acknowledgements)
-34. [Contact](#34-contact)
+2. [Implemented Features](#2-implemented-features)
+3. [High-Level Architecture](#3-high-level-architecture)
+4. [Technology Stack](#4-technology-stack)
+5. [Project Structure](#5-project-structure)
+6. [Modules in Detail](#6-modules-in-detail)
+7. [Database Design](#7-database-design)
+8. [REST API Reference](#8-rest-api-reference)
+9. [Scheduler & Jobs](#9-scheduler--jobs)
+10. [Alpha Scoring Engine](#10-alpha-scoring-engine)
+11. [Installation](#11-installation)
+12. [Local Development](#12-local-development)
+13. [Environment Variables](#13-environment-variables)
+14. [Testing](#14-testing)
+15. [Code Quality](#15-code-quality)
+16. [Next Phases & Roadmap](#16-next-phases--roadmap)
+17. [License](#17-license)
 
 ---
 
@@ -65,711 +43,983 @@
 ### Vision
 A world where anyone doing early-stage crypto research has access to the same class of on-chain and off-chain signal analysis that quantitative trading desks use internally — presented transparently, with every score traceable to the data that produced it.
 
-### Mission
-Continuously discover newly launched tokens across major blockchains, enrich them with liquidity, wallet, developer, social, and narrative signals, and surface an explainable **Alpha Score** — never a black-box prediction.
-
 ### Purpose
 Manual crypto research is slow, fragmented across a dozen tools, and biased toward whoever shouts loudest on social media. Alpha Hunter automates the *data collection and signal aggregation* work, leaving the human in charge of the final judgment call.
 
-### Target Users
-| User | Use Case |
-|---|---|
-| Independent researchers | Screen new listings without manually checking 5+ sites per token |
-| Quant/dev teams | Programmatic access via REST API for internal tooling |
-| Content creators / analysts | Data-backed narrative and trend reporting |
-| Engineers learning AI/data engineering | Reference implementation of a production-grade data platform |
-
-### Business Value
-- Reduces research time from hours to minutes per token
-- Centralizes fragmented data sources into one queryable system
-- Produces a defensible, explainable score instead of unverifiable "gut feel" calls
-
-### Technical Value
-- Reference-quality implementation of Clean Architecture in an async Python service
-- Demonstrates multi-source data normalization, caching, and idempotent ingestion at scale
-- A genuine ML pipeline (later milestones) trained on real historical outcomes, not synthetic data
+### Current State (V1 — Core Screener)
+The platform is fully operational with **37 database tables** across **22 migrations**, **8 API router modules**, **6 scheduled background jobs**, a **React SPA dashboard**, and **7 intelligence services** covering token discovery, wallet analysis, contract security, social signals, narrative classification, developer activity, and whale event detection.
 
 ### Key Capabilities
-- Multi-chain, multi-provider token discovery
-- Liquidity, contract-risk, wallet, developer, social, and narrative analysis (see [Roadmap](#26-roadmap) for what's live today vs. planned)
-- Explainable scoring — every score decomposes into its contributing factors
+- Multi-chain, multi-provider token discovery (DexScreener + GeckoTerminal)
+- Liquidity, contract-risk, wallet, developer, social, and narrative analysis
+- Explainable Alpha Score — every score decomposes into its contributing factors
 - REST API with search, filtering, sorting, pagination
-- Scheduled, automatic data refresh
+- Scheduled, automatic data refresh via APScheduler
+- Real-time whale event detection
+- LLM-based narrative classification (Anthropic Claude)
+- React dashboard with token screener, detail views, system monitoring
 
 ### Non-Goals
-- ❌ Alpha Hunter does **not** execute trades
-- ❌ Alpha Hunter does **not** custody funds or private keys
-- ❌ Alpha Hunter does **not** promise or predict returns
-- ❌ Alpha Hunter is **not** a replacement for your own due diligence
-
-> **⚠️ Disclaimer:** Alpha Hunter is a research and data-aggregation tool. Cryptocurrency markets are highly volatile and speculative. Nothing produced by this system constitutes financial advice. Newly launched tokens carry a materially elevated risk of scams, rug pulls, and total loss of capital. Always do your own research.
+- Alpha Hunter does **not** execute trades
+- Alpha Hunter does **not** custody funds or private keys
+- Alpha Hunter does **not** promise or predict returns
+- Alpha Hunter is **not** a replacement for your own due diligence
 
 ---
 
-## 2. Features
+## 2. Implemented Features
 
-### V1 — Core Screener ✅ complete
-- [x] Project scaffolding, config management, structured logging
-- [x] Async SQLAlchemy + Alembic + PostgreSQL persistence
-- [x] DexScreener collector (cached, retried, upserted)
-- [ ] GeckoTerminal collector + cross-provider deduplication
-- [ ] APScheduler background refresh
-- [ ] Token search/filter/sort/pagination API
-- [ ] Token detail + historical snapshots
-- [ ] Ranking Engine V1 (liquidity, volume, market cap, age, growth)
-- [ ] CLI management commands
-- [ ] Test suite ≥90% coverage, full documentation, V1 release
+### Token Discovery & Ingestion (V1)
+- Multi-provider token discovery from **DexScreener** (new token profiles + pairs) and **GeckoTerminal** (new pools across all supported networks)
+- Protocol-based provider interface — add new data sources without changing ingestion logic
+- Redis-cached HTTP clients with tenacity retry policies
+- Quality gate: filters out tokens below $10 liquidity AND $10 volume (eliminates mint-and-dump junk)
+- Cross-provider deduplication via upsert on `(chain, contract_address)`
+- Historical snapshots recorded on every ingestion cycle
 
-### V2 — Wallet Intelligence *(planned)*
-- [ ] Smart money / VC / exchange wallet tagging
-- [ ] Wallet clustering, accumulation/selling pattern detection
+### Token Search & API (V1)
+- Full-text search by token name/symbol
+- Filter by chain, minimum liquidity/volume/market cap, time windows (24h/7d/30d)
+- Sort by any numeric field including alpha score
+- Paginated responses with total count
+- OpenAPI docs at `/docs` and `/redoc`
 
-### V3 — Contract Security *(planned)*
-- [ ] Mint function, ownership, proxy, tax detection
-- [ ] Automated contract risk score
+### Alpha Score Ranking Engine (V1)
+- 8 weighted factors: liquidity (0.16), volume (0.12), market cap (0.08), age (0.08), liquidity growth (0.16), contract safety (0.21), social signal (0.09), developer activity (0.10)
+- Log-scale scoring for USD values (meaningful at low ranges, saturating at high ranges)
+- "No data = neutral 50" convention — missing signals don't penalize scores
+- Explainable breakdown stored as JSONB per token
 
-### V4–V15 — Whale Tracking, Social Intelligence, Narrative Detection, GitHub Analysis, ML, Alpha Score Engine, Alerts, React Dashboard, Portfolio, Paper Trading, Backtesting, AI Research Assistant
-See [§26 Roadmap](#26-roadmap) for full detail.
+### Wallet Intelligence (V2)
+- Etherscan-based transfer log fetching for EVM chains
+- Holder aggregation: raw transfers → net balances → ranked holders
+- Heuristic wallet classification (top-3 holders flagged as WHALE)
+- Wallet confidence scoring with upgrade logic on re-scan
+
+### Contract Security (V3)
+- GoPlus token security API integration
+- Risk scoring: deducts from 100 for honeypot, rug-pull, mint functions, ownership renounce status, high buy/sell taxes
+- Flags: honeypot, suspicious mint, can_take_back_ownership, hidden_owner, selfdestruct, external_call, proxy, buy_tax/sell_tax
+
+### Whale Tracking (V4)
+- Append-only whale event log (never upserted — full historical record)
+- Event types: NEW_POSITION, ACCUMULATION, DISTRIBUTION
+- Bounded automated scanning: top 10 tokens by alpha score (rate-limit conscious)
+- Cross-token whale activity feed API
+
+### Social Intelligence (V5)
+- Telegram public channel scraping (member count, online status, message volume)
+- Social scoring: member size, activity rate, growth trend
+- Inorganic growth detection (sudden spikes in member count)
+- Bounded scanning: top 10 tokens by alpha score (respects Telegram's non-API page scraping)
+
+### Narrative Detection (V6)
+- LLM-based narrative classification via Anthropic Claude (Haiku)
+- 12 narrative categories: DeFi, Meme, Gaming, AI, Infrastructure, Privacy, DePIN, RWAs, Layer2, DAO, Launchpad, Undefined
+- Per-token narrative with confidence score and reasoning
+- Batch classification of never-classified tokens (20 per run, LLM cost-bounded)
+
+### GitHub / Developer Analysis (V7)
+- GitHub API integration (repo info, contributors, releases, stars, forks)
+- Developer activity scoring: popularity (stars+forks), freshness (recent releases), contributor count
+- "No data = neutral" — most tokens lack public repo links
+
+### Scheduler & Automation (M5)
+- 6 automated jobs with APScheduler AsyncIOScheduler
+- Redis-based distributed locks (prevents concurrent execution across processes)
+- Centralized job execution wrapper: locking, timing, error capture, persistence to job_runs table
+- Health monitoring endpoints: `/health/scheduler`, `/health/jobs`
+- CLI commands for manual job management (run, pause, resume, enable, disable)
+
+### React Dashboard (V11)
+- 7 routes: Dashboard, Screener, Token Detail, Wallets/Whales, System, Narratives, Settings
+- Token screener with search, chain filter, time windows, sortable columns, pagination
+- Token detail with tabbed views: Overview, Charts, Whales, Contract, Social, Developer, Narratives
+- Whale activity feed
+- Narrative distribution chart
+- System monitoring with job cards and scheduler summary
+- Dark/light theme, collapsible sidebar, animated transitions
+- Responsive design with Tailwind CSS
+
+### CLI Management
+- `alpha-hunter ingest` — manual ingestion from providers
+- `alpha-hunter db` — alembic upgrade/downgrade/current
+- `alpha-hunter jobs` — list/run jobs
+- `alpha-hunter rank` — manual ranking pass
+- `alpha-hunter wallets` — wallet scanning
+- `alpha-hunter whales` — whale operations
+- `alpha-hunter security` — contract security scanning
+- `alpha-hunter social` — social scanning
+- `alpha-hunter narratives` — narrative classification
 
 ---
 
-## 3. Screenshots
+## 3. High-Level Architecture
 
-> Dashboard (V11) has not been built yet — placeholders below reflect the planned UI.
-
-| View | Description |
-|---|---|
-| ![Dashboard](docs/assets/screenshot-dashboard.png) | Overview dashboard — top movers, trending narratives, alert feed |
-| ![Screener](docs/assets/screenshot-screener.png) | Token screener — filterable, sortable table of discovered tokens |
-| ![Token Detail](docs/assets/screenshot-token-detail.png) | Single-token deep dive — liquidity chart, holder distribution, score breakdown |
-| ![Wallet Tracker](docs/assets/screenshot-wallets.png) | Smart-money wallet activity feed |
-| ![Narrative Analysis](docs/assets/screenshot-narratives.png) | Narrative momentum over time |
-| ![Risk Dashboard](docs/assets/screenshot-risk.png) | Contract risk flags across tracked tokens |
-
----
-
-## 4. High-Level Architecture
-
-```mermaid
-flowchart TB
-    subgraph Sources["Data Sources"]
-        DS[DexScreener API]
-        GT[GeckoTerminal API]
-        GH[GitHub API]
-        SOC[Social APIs]
-        RPC[Chain RPC Nodes]
-    end
-
-    subgraph Collectors["Collectors Layer"]
-        DSC[DexScreener Collector]
-        GTC[GeckoTerminal Collector]
-        DEV[Developer Collector]
-        SOCC[Social Collector]
-        CHAIN[On-chain Collector]
-    end
-
-    subgraph Core["Processing Core"]
-        NORM[Normalizers]
-        SVC[Service Layer]
-        RANK[Ranking / Scoring Engine]
-        ML[ML Pipeline]
-    end
-
-    subgraph Storage["Storage"]
-        PG[(PostgreSQL)]
-        REDIS[(Redis Cache)]
-    end
-
-    subgraph Delivery["Delivery Layer"]
-        API[FastAPI REST API]
-        SCHED[APScheduler Jobs]
-        ALERT[Alert Engine]
-        DASH[React Dashboard]
-    end
-
-    DS --> DSC --> NORM
-    GT --> GTC --> NORM
-    GH --> DEV --> NORM
-    SOC --> SOCC --> NORM
-    RPC --> CHAIN --> NORM
-
-    NORM --> SVC --> PG
-    SVC <--> REDIS
-    SVC --> RANK --> PG
-    SVC --> ML --> PG
-
-    SCHED --> SVC
-    PG --> API
-    API --> DASH
-    RANK --> ALERT
+```
+External APIs (DexScreener, GeckoTerminal, Etherscan, GoPlus, GitHub, Telegram, Anthropic)
+    |
+    v
+Collectors Layer (HTTP clients with Redis caching + tenacity retry)
+    |
+    v
+Normalizers (provider-specific JSON -> internal Pydantic DTOs)
+    |
+    v
+Service Layer (orchestration business logic — knows the sequence of operations)
+    |
+    v
+Repository Layer (the ONLY layer that issues SQL/ORM queries)
+    |
+    v
+Database (PostgreSQL 17 — 12+ tables, async via asyncpg)
+    |
+    v
+API Layer (FastAPI routers — 8 modules, thin, delegate to services)
+    |
+    v
+Frontend (React 19 SPA) / CLI (Typer) / REST clients
 ```
 
-**Component responsibilities:**
-- **Collectors** — provider-specific HTTP clients; know *how* to talk to one external API, nothing else.
-- **Normalizers** — translate each provider's raw JSON shape into internal DTOs.
-- **Service Layer** — orchestrates business workflows (ingest, score, alert); the only layer that knows the *sequence* of operations.
-- **Repositories** — the only layer that issues SQL/ORM queries.
-- **Ranking/ML** — read persisted data, write back scores; never call external APIs directly.
-- **API** — HTTP-facing, thin, delegates to services.
+**Key patterns:**
+- **Repository Pattern** — every data access goes through typed repository classes
+- **Protocol-based Providers** — `TokenProvider` protocol allows plugging in new data sources
+- **Dependency Injection** — FastAPI Depends() for database sessions, constructor injection for services
+- **Upsert Pattern** — most tables use INSERT...ON CONFLICT
+- **Event Sourcing (Whale Events)** — append-only, never upserted
+- **Explainable Scoring** — every score has factor_breakdown JSONB
 
 ---
 
-## 5. Technology Stack
+## 4. Technology Stack
 
 ### Backend
-| Technology | Why |
-|---|---|
-| Python 3.13+ | Modern async syntax, performance improvements, strong typing support |
-| FastAPI | Async-native, auto-generated OpenAPI docs, Pydantic integration |
-| Pydantic v2 | Fast validation, used consistently for config, DTOs, and API schemas |
+| Technology | Version | Purpose |
+|---|---|---|
+| Python | 3.13+ | Core runtime |
+| FastAPI | 0.115+ | Async REST framework |
+| Pydantic v2 / pydantic-settings | 2.9+ | Validation, DTOs, config |
+| SQLAlchemy 2.x (async) | 2.0.36+ | ORM with async support |
+| Alembic | 1.14+ | Database migrations |
+| APScheduler | 3.10+ | Background job scheduling |
+| structlog | 24.4+ | Structured logging |
+| httpx | 0.27+ | Async HTTP client |
+| tenacity | 9.0+ | Retry logic |
+| Typer | 0.13+ | CLI framework |
+| Anthropic SDK | 0.39+ | LLM narrative classification |
 
-### Database
-| Technology | Why |
-|---|---|
-| PostgreSQL 17 | Mature, ACID-compliant, strong JSON + full-text + partitioning support for time-series-heavy data |
-| SQLAlchemy 2.x (async) | Industry-standard ORM with first-class async support |
-| Alembic | Versioned, reviewable schema migrations |
+### Database & Cache
+| Technology | Version | Purpose |
+|---|---|---|
+| PostgreSQL | 17 | Primary database |
+| Redis | 7+ | Caching, rate limiting, job locks |
+| asyncpg | 0.30+ | Async PostgreSQL driver |
 
-### Blockchain
-| Technology | Why |
-|---|---|
-| web3.py | De facto standard for EVM chain interaction in Python |
-| eth-account | Local key handling for read-only wallet analysis (no custody) |
-
-### AI/ML
-| Technology | Why |
-|---|---|
-| scikit-learn | Baseline models, preprocessing pipelines, evaluation metrics |
-| XGBoost / LightGBM / CatBoost | Gradient-boosted trees — strong performance on tabular, imbalanced financial data; comparing three lets us pick the best per-feature-set performer |
-| sentence-transformers | Embedding-based narrative/topic classification |
-
-### Data Processing
-| Technology | Why |
-|---|---|
-| Pandas | Feature engineering, dataset assembly for ML |
-| Polars | Faster columnar processing for large historical backtests |
-
-### DevOps
-| Technology | Why |
-|---|---|
-| Docker / Docker Compose | Reproducible local + deployment environments |
-| GitHub Actions | CI: lint, type-check, test, coverage gate on every PR |
+### Frontend
+| Technology | Version | Purpose |
+|---|---|---|
+| React | 19.2+ | UI framework |
+| TypeScript | 6.0+ | Type safety |
+| Vite | 8.1+ | Build tool |
+| Tailwind CSS | 4.3+ | Styling |
+| React Router | 7.18+ | Client-side routing |
+| TanStack React Query | 5.101+ | Server state / caching |
+| Zustand | 5.0+ | Client state management |
+| Axios | 1.18+ | HTTP client |
+| Recharts | 3.9+ | Charts |
+| Framer Motion | 12.42+ | Animations |
+| Lucide React | 1.24+ | Icons |
+| React Hook Form | 7.81+ | Forms |
+| Zod | 4.4+ | Validation |
 
 ### Testing
-| Technology | Why |
+| Technology | Purpose |
 |---|---|
-| pytest / pytest-asyncio | Standard async-compatible test runner |
-| respx | Mocks httpx calls — collector tests never hit real networks |
-| pytest-cov | Coverage enforcement (≥90% target) |
+| pytest / pytest-asyncio | Async-compatible test runner |
+| respx | HTTP mocking for collector tests |
+| pytest-cov | Coverage enforcement |
+| Vitest | Frontend test runner |
+| Testing Library | React component tests |
 
 ### Code Quality
-| Technology | Why |
+| Technology | Purpose |
 |---|---|
-| Ruff | Fast, single-tool linting (replaces flake8 + isort + more) |
-| Black | Deterministic formatting — zero bikeshedding on style |
-| mypy (strict) | Catches type errors before runtime |
-| pre-commit | Enforces all of the above before code reaches CI |
+| Ruff | Linting (replaces flake8 + isort) |
+| Black | Deterministic formatting |
+| mypy (strict) | Static type checking |
+| pre-commit | Pre-commit hook enforcement |
+
+### DevOps
+| Technology | Purpose |
+|---|---|
+| Docker / Docker Compose | Reproducible local + deployment environments |
+| GitHub Actions | CI (planned) |
 
 ---
 
-## 6. Project Structure
+## 5. Project Structure
 
 ```
 alpha-hunter/
 ├── app/
-│   ├── api/                  # FastAPI routers — HTTP layer only
-│   │   └── v1/
-│   ├── blockchain/           # Chain-specific RPC clients (web3.py wrappers)
-│   ├── collectors/            # External data provider clients + normalizers
+│   ├── api/                    # FastAPI routers — HTTP layer only
+│   │   ├── health.py           # Health check endpoints (/health, /health/scheduler, /health/jobs)
+│   │   └── v1/                 # V1 API routers (8 modules)
+│   │       ├── tokens.py       # Token search, detail, snapshots
+│   │       ├── jobs.py         # Job management (run, pause, resume)
+│   │       ├── wallets.py      # Wallet scanning + whale events
+│   │       ├── contract_security.py  # Contract security scanning
+│   │       ├── social.py       # Social score scanning
+│   │       ├── narratives.py   # Narrative classification
+│   │       └── developer.py    # Developer activity scanning
+│   ├── blockchain/             # Chain-specific utilities
+│   │   └── chain_ids.py        # EIP-155 chain ID mappings
+│   ├── cli/                    # Typer CLI entry points
+│   │   ├── main.py             # CLI app factory
+│   │   └── commands/           # Command groups (ingest, db, jobs, rank, wallets, whales, security, social, narratives)
+│   ├── collectors/             # External data provider clients + normalizers
+│   │   ├── base.py             # TokenProvider Protocol
+│   │   ├── dexscreener_*.py    # DexScreener client, normalizer, provider
+│   │   ├── geckoterminal_*.py  # GeckoTerminal client, normalizer, provider
+│   │   ├── etherscan_client.py # Etherscan transfer log fetching
+│   │   ├── goplus_client.py    # GoPlus contract security API
+│   │   ├── github_client.py    # GitHub API (repo, contributors, releases)
+│   │   ├── telegram_client.py  # Telegram channel preview scraper
+│   │   └── anthropic_client.py # Claude Haiku narrative classification
+│   ├── contracts/              # Contract analysis
+│   │   └── risk_scoring.py     # GoPlus-based risk scoring
 │   ├── core/
-│   │   ├── config/            # pydantic-settings configuration
-│   │   ├── database/           # SQLAlchemy engine/session, Alembic migrations
-│   │   └── logging/            # structlog setup
-│   ├── models/                # SQLAlchemy ORM models
-│   ├── schemas/                # Pydantic DTOs (API request/response, provider payloads)
-│   ├── repositories/           # Data access layer (Repository Pattern)
-│   ├── services/                # Business logic / use-case orchestration
-│   ├── ranking/                 # Scoring engine (planned M8)
-│   ├── risk/                    # Contract/wallet risk analysis (planned V3)
-│   ├── ml/                      # Feature engineering, training, inference (planned V8)
-│   ├── alerts/                  # Notification dispatch (planned V10)
-│   ├── dashboard/                # (planned V11 — separate React app)
-│   ├── tests/                    # pytest suite, mirrors app/ structure
-│   └── main.py                   # FastAPI app factory / composition root
+│   │   ├── config/             # pydantic-settings (single source of truth)
+│   │   ├── database/           # SQLAlchemy engine/session + Alembic migrations (22 revisions)
+│   │   ├── cache.py            # Redis cache wrapper
+│   │   ├── exceptions.py       # Domain exception hierarchy
+│   │   └── locks.py            # Redis-based distributed job locks
+│   ├── developer/              # Developer analysis
+│   │   └── scoring.py          # GitHub-based activity scoring
+│   ├── ml/                     # ML pipeline placeholder (empty)
+│   ├── models/                 # SQLAlchemy ORM models (12 models)
+│   │   ├── token.py            # Token, Chain enum
+│   │   ├── alpha_score.py      # AlphaScore with factor_breakdown
+│   │   ├── token_snapshot.py   # Historical market data snapshots
+│   │   ├── wallet.py           # Wallet + WalletType enum
+│   │   ├── wallet_holding.py   # Token-wallet balances
+│   │   ├── whale_event.py      # WhaleEvent + WhaleEventType enum
+│   │   ├── contract_security.py # Contract security analysis
+│   │   ├── social_score.py     # Social score + inorganic growth flag
+│   │   ├── social_snapshot.py  # Telegram snapshot data
+│   │   ├── narrative_classification.py # Narrative + NarrativeClassification
+│   │   ├── developer_activity.py # Developer activity scores
+│   │   └── job_run.py          # Job execution history
+│   ├── narratives/             # Narrative analysis
+│   │   └── classifier_prompt.py # LLM prompt + parser
+│   ├── ranking/                # Scoring engine
+│   │   └── scoring.py          # 8-factor weighted Alpha Score calculation
+│   ├── repositories/           # Data access layer (Repository Pattern, 10 repos)
+│   ├── scheduler/              # Background job system
+│   │   ├── scheduler.py        # APScheduler setup + 6 job definitions
+│   │   ├── registry.py         # Job registry + stats tracking
+│   │   ├── jobs.py             # Job implementations
+│   │   └── execution.py        # Central execution wrapper (locking, timing, persistence)
+│   ├── schemas/                # Pydantic DTOs (API + provider payloads)
+│   ├── services/               # Business logic / use-case orchestration
+│   │   ├── token_ingestion_service.py
+│   │   ├── ranking_service.py
+│   │   ├── wallet_discovery_service.py
+│   │   ├── contract_security_service.py
+│   │   ├── social_intelligence_service.py
+│   │   ├── narrative_classification_service.py
+│   │   └── developer_intelligence_service.py
+│   ├── social/                 # Social analysis
+│   │   ├── scoring.py          # Telegram-based social scoring
+│   │   └── telegram_parser.py  # Telegram HTML preview parser
+│   ├── wallets/                # Wallet analysis
+│   │   ├── classification.py   # Heuristic wallet type classification
+│   │   ├── holder_aggregator.py # Transfer log → net balance aggregation
+│   │   └── whale_detection.py  # New position / accumulation / distribution detection
+│   ├── tests/                  # pytest suite
+│   ├── main.py                 # FastAPI app factory / composition root
+├── frontend/                   # React SPA
+│   └── src/
+│       ├── api/                # Axios API client modules (9 modules)
+│       ├── components/         # Reusable UI components
+│       ├── features/           # Feature-specific components
+│       ├── hooks/              # React Query hooks (12 hooks)
+│       ├── layouts/            # App layout, sidebar, topbar
+│       ├── pages/              # Page components (7 pages)
+│       ├── store/              # Zustand stores (theme, toasts)
+│       ├── types/              # TypeScript type definitions
+│       └── test/               # Vitest test files
 ├── docker/
-│   └── Dockerfile                # Multi-stage: dev / production targets
-├── docs/                          # Architecture docs, ADRs, roadmap
-├── scripts/                        # One-off ops/maintenance scripts
-├── .github/workflows/               # CI pipeline definitions
-├── docker-compose.yml
-├── pyproject.toml
-├── alembic.ini
-├── .env.example
+│   └── docker-compose.yml      # PostgreSQL 17 + Redis 7
+├── tests/
+│   └── load/                   # Locust load testing
+├── pyproject.toml              # Project metadata + tool config
+├── alembic.ini                 # Migration configuration
 └── README.md
 ```
 
 ---
 
-## 7. System Workflow
+## 6. Modules in Detail
 
-```mermaid
-sequenceDiagram
-    participant Sched as Scheduler
-    participant Col as Collector
-    participant Norm as Normalizer
-    participant Svc as IngestionService
-    participant Repo as Repository
-    participant DB as PostgreSQL
-    participant Rank as Ranking Engine
-    participant API as REST API
-    participant User as Client / Dashboard
+### 6.1 Collectors Layer
+Each external API has its own **client** (HTTP handler with caching + retry), **normalizer** (JSON → internal DTO), and **provider** (implements `TokenProvider` Protocol). This isolation means a rate-limit hit or schema change in one provider never affects others.
 
-    Sched->>Col: trigger fetch (interval)
-    Col->>Col: check Redis cache
-    alt cache miss
-        Col->>Col: HTTP GET provider API (retried)
-    end
-    Col->>Norm: raw provider JSON
-    Norm->>Svc: normalized TokenCreate DTO
-    Svc->>Repo: upsert(token)
-    Repo->>DB: INSERT ... ON CONFLICT UPDATE
-    Sched->>Rank: trigger scoring pass
-    Rank->>DB: read latest signals
-    Rank->>DB: write AlphaScore
-    User->>API: GET /api/v1/tokens?sort=alpha_score
-    API->>Repo: query
-    Repo->>DB: SELECT
-    DB-->>API: rows
-    API-->>User: paginated JSON response
-```
+| Collector | Data Source | Caching | Retry |
+|---|---|---|---|
+| DexScreener | new token profiles + pairs | Redis 60s TTL | 3 attempts, exponential backoff |
+| GeckoTerminal | new pools across networks | Redis 60s TTL | 3 attempts, exponential backoff |
+| Etherscan | ERC-20 transfer logs | Redis 300s TTL | 3 attempts |
+| GoPlus | token contract security | Redis 3600s TTL | 2 attempts |
+| GitHub | repo info, contributors, releases | No cache | 3 attempts |
+| Telegram | channel preview pages | No cache | 1 attempt |
+| Anthropic | narrative classification | No cache | 2 attempts |
 
----
+### 6.2 Repository Layer
+All database access goes through repository classes. Key operations:
 
-## 8. Data Flow
+- **TokenRepository** — CRUD + search/filter/sort with whitelisted sort fields (prevents injection)
+- **AlphaScoreRepository** — upsert by token_id
+- **WalletRepository** — get-or-create with confidence upgrade
+- **WalletHoldingRepository** — upsert with previous-balance tracking (for whale detection)
+- **SocialScoreRepository / SocialSnapshotRepository** — point-in-time + score pair
+- **NarrativeRepository** — upsert, list_unclassified, distribution query
+- **DeveloperActivityRepository** — get/upsert
 
-```mermaid
-flowchart LR
-    A[Provider APIs] -->|raw JSON| B[Collector]
-    B -->|cached 60s| C[(Redis)]
-    B -->|parsed| D[Normalizer]
-    D -->|TokenCreate DTO| E[Service Layer]
-    E -->|upsert| F[(PostgreSQL)]
-    F -->|read| G[Ranking Engine]
-    G -->|AlphaScore| F
-    F -->|read| H[FastAPI]
-    H -->|JSON| I[Client / Dashboard / CLI]
-    G -.->|threshold breach| J[Alert Engine]
-    J -->|notify| K[Telegram / Discord / Slack]
-```
+### 6.3 Service Layer
+| Service | Purpose |
+|---|---|
+| TokenIngestionService | Multi-provider ingest with quality gate + snapshot recording |
+| RankingService | 8-factor Alpha Score computation for one or all tokens |
+| WalletDiscoveryService | Transfer log fetch → holder aggregation → whale event creation |
+| ContractSecurityService | On-demand GoPlus scan + risk scoring |
+| SocialIntelligenceService | Telegram scrape → social score + inorganic growth detection |
+| NarrativeClassificationService | LLM classify + batch unclassified tokens |
+| DeveloperIntelligenceService | GitHub analysis → developer activity score |
+
+### 6.4 Scoring Modules
+
+**Alpha Score** (`app/ranking/scoring.py`): 8 weighted factors → 0–100 composite, with per-factor breakdown stored as JSONB.
+
+**Contract Risk** (`app/contracts/risk_scoring.py`): Starts at 100, deducts for honeypot (–40), mint function (–20), rug-pull flags (–15 each), high taxes (–5 per % above threshold). Missing data = neutral 50.
+
+**Social Scoring** (`app/social/scoring.py`): Member size (up to 60pts), activity rate (up to 25pts), member growth rate (up to 15pts). Flags inorganic growth when member count spikes >200% in a single interval.
+
+**Developer Scoring** (`app/developer/scoring.py`): Popularity (stars+forks, capped at 40), freshness (days since last release, capped at 30), contributor count (capped at 30). Combined linearly to 0–100.
 
 ---
 
-## 9. Installation
+## 7. Database Design
+
+### Current Schema (12 tables)
+
+```
+tokens                    — Primary token registry. Unique on (chain, contract_address)
+alpha_scores              — Computed scores with factor_breakdown JSONB per token
+token_snapshots           — Point-in-time market data (price, liquidity, volume) for charts
+wallets                   — Discovered wallets with type classification
+wallet_holdings           — Token-wallet balance with rank
+whale_events              — Append-only whale activity log (event_type, prev/new balance, change_usd)
+contract_securities       — GoPlus security scan results (safety_score, flags, taxes)
+social_scores             — Social media scores with factor_breakdown JSONB
+token_social_snapshots    — Telegram channel point-in-time data (members, messages)
+narrative_classifications — LLM-generated narrative with confidence and reasoning
+developer_activities      — GitHub analysis results (score, stars, forks, contributors)
+job_runs                  — Scheduled job execution history (status, duration, error)
+```
+
+### Migration Strategy
+22 Alembic revisions, all generated via `alembic revision --autogenerate`. Applied via `alembic upgrade head` in CI and deployment pipelines.
+
+---
+
+## 8. REST API Reference
+
+**Base URL:** `http://localhost:8000/api/v1` (local)
+
+### Health
+| Method | Path | Description |
+|---|---|---|
+| GET | `/health` | Liveness check |
+| GET | `/health/scheduler` | Scheduler status + aggregated job stats |
+| GET | `/health/jobs` | Per-job status (enabled, last run, failure count) |
+
+### Tokens
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/tokens` | Search/filter/sort/paginate tokens |
+| GET | `/api/v1/tokens/{id}` | Single token detail |
+| GET | `/api/v1/tokens/{id}/snapshots` | Historical price/liquidity snapshots |
+
+**Query parameters for `GET /api/v1/tokens`:**
+- `q` — text search (name/symbol)
+- `chain` — filter by chain (ethereum, base, solana, bnb, arbitrum, polygon, avalanche, optimism)
+- `min_liquidity`, `min_volume`, `min_market_cap` — numeric floor filters
+- `created_since`, `created_before` — ISO date range filters
+- `sort` — field to sort by (prefix `-` for descending, e.g. `-alpha_score`)
+- `page`, `page_size` — pagination
+
+### Jobs
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/jobs` | List all registered jobs with stats |
+| GET | `/api/v1/jobs/{id}` | Single job detail |
+| POST | `/api/v1/jobs/{id}` | Trigger/run a job |
+
+### Wallets & Whales
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/tokens/{id}/wallets` | Token holder rankings |
+| POST | `/api/v1/tokens/{id}/wallets` | Scan token for wallets (Etherscan) |
+| GET | `/api/v1/whales/recent` | Recent whale events across all tokens |
+| GET | `/api/v1/tokens/{id}/wallets/whale-events` | Whale events for specific token |
+
+### Contract Security
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/tokens/{id}/security` | Get stored security analysis |
+| POST | `/api/v1/tokens/{id}/security/scan` | Trigger GoPlus security scan |
+
+### Social
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/tokens/{id}/social` | Get stored social score |
+| POST | `/api/v1/tokens/{id}/social/scan` | Trigger Telegram social scan |
+
+### Narratives
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/tokens/{id}/narrative` | Get stored narrative classification |
+| POST | `/api/v1/tokens/{id}/narrative/classify` | Trigger LLM narrative classification |
+| GET | `/api/v1/narratives/distribution` | Aggregate narrative distribution |
+
+### Developer Activity
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/tokens/{id}/developer` | Get stored developer analysis |
+| POST | `/api/v1/tokens/{id}/developer/scan` | Trigger GitHub analysis |
+
+Interactive OpenAPI docs at `/docs` (Swagger UI) and `/redoc`.
+
+---
+
+## 9. Scheduler & Jobs
+
+6 automated jobs run via APScheduler `AsyncIOScheduler`:
+
+| Job ID | Interval | Category | Description |
+|---|---|---|---|
+| `refresh_dexscreener` | 90s | collector | Fetch latest token profiles + pairs |
+| `refresh_geckoterminal` | 90s | collector | Fetch new pools across supported networks |
+| `compute_alpha_scores` | 120s | ranking | Recompute Alpha Scores for all tokens |
+| `scan_top_tokens_for_whale_activity` | 20min | whale-monitoring | Scan top-10 tokens for holder balance changes |
+| `scan_top_tokens_for_social_activity` | 60min | social | Scan top-10 tokens' Telegram channels |
+| `classify_unclassified_narratives` | 10min | narrative | Classify up to 20 never-classified tokens per run |
+
+**Execution guarantees:**
+- Redis-based distributed locks prevent concurrent execution
+- Every execution is persisted to `job_runs` table (status, duration, error)
+- `max_instances=1` — no overlapping runs
+- Jobs can be paused/resumed/enabled/disabled at runtime
+
+---
+
+## 10. Alpha Scoring Engine
+
+### Philosophy
+Every score must be traceable to the specific data points that produced it.
+
+### 8 Weighted Factors
+
+| Factor | Weight | Source | Range |
+|---|---|---|---|
+| Liquidity | 0.16 | Log-scale from $1k (0) to $1M (100) | 0–100 |
+| Volume (24h) | 0.12 | Log-scale from $1k (0) to $1M (100) | 0–100 |
+| Market Cap | 0.08 | Log-scale from $10k (0) to $50M (100) | 0–100 |
+| Age | 0.08 | 100 at discovery → linear decay to 0 at 30 days | 0–100 |
+| Liquidity Growth | 0.16 | Neutral 50 with no history; 0–100 based on % change | 0–100 |
+| Contract Safety | 0.21 | Pass-through of GoPlus safety_score; neutral 50 if unscanned | 0–100 |
+| Social Signal | 0.09 | Pass-through of Telegram score; halved if inorganic growth flagged | 0–100 |
+| Developer Activity | 0.10 | Pass-through of GitHub score; neutral 50 if unscanned | 0–100 |
+
+### Explainability
+The `AlphaScore.factor_breakdown` JSONB column stores every factor's raw score and weight alongside the composite, enabling the API to return the "why" alongside the "what".
+
+---
+
+## 11. Installation
 
 ### Prerequisites
-| Requirement | Minimum Version | Notes |
-|---|---|---|
-| Python | 3.13+ | Use `pyenv` if your OS ships an older default |
-| Docker + Docker Compose | 24+ | For Postgres/Redis without local installs |
-| Git | any recent | |
+| Requirement | Minimum Version |
+|---|---|
+| Python | 3.13+ |
+| Docker + Docker Compose | 24+ |
+| Git | any recent |
 
-### Supported OS
-Linux (primary), macOS, Windows via WSL2. Native Windows is untested.
-
-### Docker Installation
-Follow the [official Docker Engine install guide](https://docs.docker.com/engine/install/) for your OS, then confirm:
+### Docker Installation (Recommended)
 ```bash
-docker --version
-docker compose version
-```
-
-### PostgreSQL & Redis
-Not required to be installed locally — both run via `docker-compose.yml`. If you prefer native installs, PostgreSQL 17+ and Redis 7+ work identically; just point `DATABASE_URL`/`REDIS_URL` at them.
-
----
-
-## 10. Local Development
-
-```bash
-# 1. Clone the repository
+# Clone
 git clone <repository-url> alpha-hunter
 cd alpha-hunter
 
-# 2. Create and activate a virtual environment
-python3 -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+# Start PostgreSQL + Redis
+docker compose up -d postgres redis
 
-# 3. Install dependencies
+# Run migrations
+alembic upgrade head
+
+# Start the API
+uvicorn app.main:app --reload
+```
+
+### Manual Installation
+```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
+# Ensure PostgreSQL 17+ and Redis 7+ are running
+alembic upgrade head
+uvicorn app.main:app --reload
+```
 
-# 4. Configure environment variables
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev     # Vite dev server on :5173
+npm run build   # Production build
+```
+
+---
+
+## 12. Local Development
+
+```bash
+# 1. Start infrastructure
+docker compose up -d postgres redis
+docker compose ps                    # confirm both are "healthy"
+
+# 2. Set up environment
 cp .env.example .env
 # edit .env: set SECRET_KEY, confirm DATABASE_URL / REDIS_URL
 
-# 5. Start PostgreSQL + Redis
-docker compose up -d postgres redis
-docker compose ps                 # confirm both are "healthy"
-
-# 6. Run database migrations
+# 3. Install + migrate
+pip install -e ".[dev]"
 alembic upgrade head
 
-# 7. (Once implemented) start the scheduler
-python -m app.scheduler
-
-# 8. Run the FastAPI server
+# 4. Start API + scheduler (scheduler starts automatically with the app)
 uvicorn app.main:app --reload
 
-# 9. Verify
+# 5. Start frontend (separate terminal)
+cd frontend && npm run dev
+
+# 6. Verify
 curl http://localhost:8000/health
 ```
 
-Frontend dashboard setup will be documented once V11 lands.
+### CLI Usage
+```bash
+# Source token ingestion
+alpha-hunter ingest dexscreener
+alpha-hunter ingest geckoterminal
+
+# Database management
+alpha-hunter db upgrade
+alpha-hunter db current
+
+# Job management
+alpha-hunter jobs list
+alpha-hunter jobs run refresh_dexscreener
+
+# Scoring
+alpha-hunter rank compute
+
+# On-demand scans
+alpha-hunter wallets scan <token-id>
+alpha-hunter whales recent
+alpha-hunter security scan <token-id>
+alpha-hunter social scan <token-id>
+alpha-hunter narratives classify <token-id>
+```
 
 ---
 
-## 11. Docker Deployment
+## 13. Environment Variables
+
+| Variable | Description | Required | Default |
+|---|---|---|---|
+| `SECRET_KEY` | JWT signing secret | Yes | — |
+| `DATABASE_URL` | Async Postgres connection string | Yes | — |
+| `REDIS_URL` | Redis connection string | Yes | — |
+| `APP_NAME` | Service display name | No | `Alpha Hunter` |
+| `ENVIRONMENT` | `local` / `development` / `staging` / `production` | No | `local` |
+| `DEBUG` | Enable FastAPI debug mode | No | `false` |
+| `LOG_LEVEL` | Minimum log level | No | `INFO` |
+| `LOG_JSON` | JSON logs (prod) vs console (dev) | No | `true` |
+| `JWT_ALGORITHM` | JWT signing algorithm | No | `HS256` |
+| `DATABASE_POOL_SIZE` | SQLAlchemy pool size | No | `10` |
+| `ETHEREUM_RPC_URL` | Ethereum RPC endpoint | No | — |
+| `ETHERSCAN_API_KEY` | Etherscan API key | No | — |
+| `GITHUB_TOKEN` | GitHub API token | No | — |
+| `ANTHROPIC_API_KEY` | Anthropic API key | No | — |
+| `CELERY_BROKER_URL` | Celery broker (defaults to REDIS_URL) | No | — |
+
+See `.env.example` for the complete up-to-date list.
+
+---
+
+## 14. Testing
 
 ```bash
-# Build and start the full stack
-docker compose up --build -d
+# Backend tests
+pytest                                          # full suite with coverage
+pytest -v                                       # verbose
+pytest --cov=app --cov-report=html              # HTML coverage report
 
-# View logs
-docker compose logs -f api
+# Frontend tests
+cd frontend && npm test                          # Vitest
+npm run test:coverage                            # With coverage
 
-# Stop (containers persist)
-docker compose stop
-
-# Stop and remove containers (volumes persist)
-docker compose down
-
-# Remove everything including volumes (⚠️ deletes DB data)
-docker compose down -v
-
-# Rebuild after dependency changes
-docker compose build --no-cache api
-docker compose up -d
+# Load tests
+locust -f tests/load/locustfile.py --headless    # Locust load testing
 ```
 
-> **Note:** the `docker/Dockerfile` uses multi-stage builds — `dev` (hot reload, dev tooling) and `production` (slim, non-root user, `HEALTHCHECK`). `docker-compose.yml` uses the `dev` target locally; production deployments should target `production` explicitly.
+**Current coverage:** 6 backend tests (settings, job locks) + 3 frontend tests (UI components). Service-layer and integration tests are a priority for the next phase.
 
 ---
 
-## 12. Environment Variables
-
-| Variable | Description | Required | Default | Example |
-|---|---|:---:|---|---|
-| `APP_NAME` | Display name of the service | No | `Alpha Hunter` | `Alpha Hunter` |
-| `ENVIRONMENT` | Deployment environment | No | `local` | `production` |
-| `DEBUG` | Enable FastAPI debug mode | No | `false` | `true` |
-| `LOG_LEVEL` | Minimum log level | No | `INFO` | `DEBUG` |
-| `LOG_JSON` | Emit JSON logs (prod) vs console (dev) | No | `true` | `false` |
-| `SECRET_KEY` | JWT signing secret | **Yes** | — | `openssl rand -hex 32` output |
-| `JWT_ALGORITHM` | JWT signing algorithm | No | `HS256` | `HS256` |
-| `DATABASE_URL` | Async Postgres connection string | **Yes** | — | `postgresql+asyncpg://user:pass@localhost:5432/alpha_hunter` |
-| `DATABASE_POOL_SIZE` | SQLAlchemy connection pool size | No | `10` | `20` |
-| `REDIS_URL` | Redis connection string | **Yes** | — | `redis://localhost:6379/0` |
-| `CELERY_BROKER_URL` | Celery broker (defaults to `REDIS_URL`) | No | `REDIS_URL` | `redis://localhost:6379/1` |
-| `ETHEREUM_RPC_URL` | Ethereum RPC endpoint | No | — | Alchemy/Infura URL |
-| `BASE_RPC_URL` | Base RPC endpoint | No | — | |
-| `SOLANA_RPC_URL` | Solana RPC endpoint | No | — | |
-| `DEXSCREENER_API_KEY` | DexScreener API key (if required by plan tier) | No | — | |
-| `OPENAI_API_KEY` | OpenAI API key (narrative/NLP features) | No | — | |
-| `ANTHROPIC_API_KEY` | Anthropic API key (narrative/NLP features) | No | — | |
-| `TELEGRAM_BOT_TOKEN` | Alert delivery via Telegram | No | — | |
-| `DISCORD_WEBHOOK_URL` | Alert delivery via Discord | No | — | |
-| `RATE_LIMIT_REQUESTS_PER_MINUTE` | API rate limit | No | `60` | `120` |
-
-See `.env.example` for the complete, up-to-date list — this table is kept in sync with it.
-
----
-
-## 13. Configuration
-
-All configuration flows through `app/core/config/settings.py::Settings`, a `pydantic-settings.BaseSettings` subclass. This is the **only** place environment variables are read — no module elsewhere should call `os.getenv` directly.
-
-**Best practices:**
-- Never commit `.env` — only `.env.example` with placeholder values.
-- Secrets are typed `SecretStr` so they never leak into logs or `repr()` output.
-- `get_settings()` is `lru_cache`d — parsed once per process, not per request.
-- Required fields (`SECRET_KEY`, `DATABASE_URL`, `REDIS_URL`) cause immediate startup failure if missing — fail fast, not three hours into a shift.
-
----
-
-## 14. Database Design
-
-```mermaid
-erDiagram
-    TOKENS {
-        uuid id PK
-        enum chain
-        string contract_address
-        string pair_address
-        string name
-        string symbol
-        int decimals
-        string dex
-        numeric liquidity_usd
-        numeric market_cap_usd
-        numeric fdv_usd
-        numeric volume_24h_usd
-        numeric price_usd
-        int holder_count
-        timestamp created_at
-        timestamp updated_at
-    }
-    ALPHA_SCORES {
-        uuid id PK
-        uuid token_id FK
-        numeric score
-        jsonb factor_breakdown
-        timestamp computed_at
-    }
-    WALLETS {
-        uuid id PK
-        string address
-        enum chain
-        enum wallet_type
-        numeric confidence_score
-    }
-    TOKENS ||--o{ ALPHA_SCORES : "has many"
-    TOKENS ||--o{ WALLETS : "held by (planned V2)"
-```
-
-**Current tables (V1):** `tokens` — unique on `(chain, contract_address)`, indexed on `chain` and `contract_address` individually for lookup performance.
-
-**Planned tables:** `alpha_scores`, `wallets`, `transactions`, `narratives`, `alerts`, `social_metrics`, `historical_prices`, `contracts`, `developer_metrics`, `ml_predictions` — introduced incrementally as their owning milestone lands.
-
-**Migration strategy:** every schema change is a reviewed Alembic migration generated via `alembic revision --autogenerate`, never a manual schema edit against a running database. Migrations are applied via `alembic upgrade head` in CI and deployment pipelines — never run ad hoc against production without review.
-
----
-
-## 15. REST API
-
-> **Status:** `/health` is live. Token search/filter/sort endpoints land in Milestone 6 — this section will be filled in with live examples at that point. Shape below reflects the planned contract.
-
-**Base URL:** `http://localhost:8000/api/v1` (local) — **Authentication:** none yet (V1); JWT bearer auth planned alongside the dashboard (V11).
-
-**Planned endpoint:**
-```
-GET /api/v1/tokens?chain=base&min_liquidity=10000&sort=-alpha_score&page=1&page_size=25
-```
-
-**Example response shape:**
-```json
-{
-  "items": [
-    {
-      "id": "b3f1...",
-      "chain": "base",
-      "symbol": "TEST",
-      "liquidity_usd": "15000.00000000",
-      "alpha_score": null
-    }
-  ],
-  "page": 1,
-  "page_size": 25,
-  "total": 1
-}
-```
-
-**Error responses** follow a consistent envelope:
-```json
-{ "detail": "Token not found", "status_code": 404 }
-```
-
-Interactive OpenAPI docs are auto-generated by FastAPI at `/docs` (Swagger UI) and `/redoc`.
-
----
-
-## 16. Scheduler
-
-*(Planned — Milestone 5)*
-
-Background refresh jobs will run via APScheduler, on a configurable interval per collector (DexScreener default: every 60s, matching the Redis cache TTL to avoid redundant work). Each job will be wrapped with the same `tenacity` retry policy used in collectors, log structured start/success/failure events, and expose job status via a future `/health/jobs` endpoint for monitoring.
-
----
-
-## 17. Alpha Scoring
-
-**Philosophy:** every score must be traceable to the specific data points that produced it. A user should never see a number with no explanation attached — this is a hard requirement, not a nice-to-have.
-
-**Explainability:** the planned `AlphaScore` model stores a `factor_breakdown` JSONB column alongside the composite score, recording each category's raw sub-score and weight, so the API can return "why" alongside "what."
-
-**Current scoring factors (V1, planned M8):** liquidity, 24h volume, market cap, token age, liquidity growth rate — a simple, transparent weighted composite as the baseline before ML-based scoring (V8/V9) is introduced.
-
-**Future enhancements:** wallet intelligence, contract risk, developer activity, social signals, and narrative momentum will each become additional weighted factors as their respective milestones land, with ML models (V8) eventually learning optimal weights from historical outcome data rather than hand-tuned weights.
-
----
-
-## 18. Logging
-
-Structured logging via `structlog`. **Format:** JSON in production (`LOG_JSON=true`) for log-aggregator ingestion; colored console output in local dev. **Levels:** standard `DEBUG`/`INFO`/`WARNING`/`ERROR`/`CRITICAL`, configured via `LOG_LEVEL`. **Correlation:** `structlog.contextvars` binds contextual fields (e.g. `chain`, `token_address`, future `job_id`/`request_id`) so all log lines emitted while processing one unit of work carry that context automatically. **Rotation:** handled at the infrastructure level (Docker log driver / log-aggregator retention policy), not application-level — the app writes to stdout per 12-Factor App principles.
-
----
-
-## 19. Security
-
-| Concern | Approach |
-|---|---|
-| Secrets management | `SecretStr` typing, `.env` git-ignored, no secrets in code or logs |
-| Authentication | JWT planned alongside dashboard (V11); currently no auth (local-only V1 scope) |
-| Input validation | Pydantic schemas validate all API input at the boundary |
-| SQL injection | SQLAlchemy parameterized queries exclusively — no raw string-interpolated SQL anywhere |
-| Rate limiting | Redis-backed, planned per `RATE_LIMIT_REQUESTS_PER_MINUTE` |
-| XSS / CSRF | Primarily a backend API; dashboard (React, V11) will apply standard React escaping + CSRF tokens for any state-changing requests |
-| Dependency scanning | GitHub Dependabot / `pip-audit` recommended in CI (planned addition) |
-
----
-
-## 20. Performance
-
-- **Async everywhere:** FastAPI + async SQLAlchemy + httpx — I/O-bound work (API calls, DB queries) never blocks the event loop.
-- **Connection pooling:** configurable `DATABASE_POOL_SIZE`/`DATABASE_MAX_OVERFLOW`, `pool_pre_ping=True` to avoid stale-connection errors.
-- **Caching:** Redis caches raw provider responses (60s TTL) to respect rate limits and avoid redundant fetches across concurrent jobs.
-- **Database optimization:** indexes on `chain`/`contract_address`; time-series tables (historical prices, planned) will use PostgreSQL partitioning by time range.
-- **Scaling strategy:** stateless API layer scales horizontally behind a load balancer; collectors/scheduler scale as independent worker processes; PostgreSQL read replicas for read-heavy dashboard queries as a future step.
-
----
-
-## 21. Monitoring & Observability
-
-- **Health checks:** `/health` (liveness, no dependency checks) live today; `/health/ready` (checks DB/Redis connectivity) planned for readiness probes — a distinct concern from liveness, so a temporary DB outage doesn't cause a crash-loop restart of an otherwise-healthy process.
-- **Metrics:** Prometheus-compatible `/metrics` endpoint planned.
-- **Tracing:** OpenTelemetry integration planned once the service graph (collectors → services → API) is stable enough to be worth tracing.
-- **Alerts (operational):** infra-level alerting (uptime, error rate) is separate from the product's own Alert Engine (V10, which alerts *users* about tokens) — both are on the roadmap.
-
----
-
-## 22. Testing
-
-```bash
-pytest                                    # full suite with coverage
-pytest app/tests/test_dexscreener_collector.py -v   # single module
-pytest --cov=app --cov-report=html        # HTML coverage report
-```
-
-**Test types:** unit tests (services, normalizers — no I/O), integration tests (repository ↔ real test DB), API tests (`httpx.ASGITransport` against the FastAPI app), collector tests (HTTP mocked via `respx` — collectors never hit real networks in CI). **Coverage goal:** ≥90%, enforced via `--cov-fail-under=90` in CI. **Performance/load tests:** planned for the M10/V1-release milestone once the API surface is stable.
-
----
-
-## 23. Code Quality
+## 15. Code Quality
 
 | Tool | Purpose | Command |
 |---|---|---|
-| Ruff | Linting (replaces flake8/isort) | `ruff check app` |
+| Ruff | Linting | `ruff check app` |
 | Black | Formatting | `black app` / `black --check app` |
-| mypy | Static type checking (strict mode) | `mypy app` |
-| pre-commit | Runs all of the above pre-commit | `pre-commit run --all-files` |
+| mypy (strict) | Type checking | `mypy app` |
+| pre-commit | All of the above | `pre-commit run --all-files` |
 
-Install hooks once per clone: `pre-commit install`.
+Install hooks: `pre-commit install`
 
----
-
-## 24. CI/CD
-
-GitHub Actions (`.github/workflows/ci.yml`) runs on every push/PR to `main`/`develop`: spins up Postgres + Redis service containers, installs the project, runs `ruff check`, `black --check`, `mypy`, then `pytest` with a coverage gate. A Docker image build/push workflow and a tagged-release workflow are planned additions once V1 ships.
-
----
-
-## 25. Documentation Standards
-
-Each completed milestone updates `docs/ARCHITECTURE.md` with its design decisions (append, don't overwrite prior milestones' sections) and `docs/ROADMAP.md` checkbox state. This `README.md` is the single source of truth for anyone new to the project — sections should be updated in the same PR as the feature they describe, not backfilled later.
+**Best practices enforced:**
+- Never bypass the Repository layer with raw SQLAlchemy in services or API routes
+- Never call `os.getenv` outside `app/core/config/settings.py`
+- Every external API integration gets its own collector + normalizer pair
+- Every layer-crossing DTO is a Pydantic model
+- Logging via structlog with context vars, never `print()` or logging.basicConfig
 
 ---
 
-## 26. Roadmap
+## 16. Next Phases & Roadmap
 
-| Version | Focus | Status |
-|---|---|:---:|
-| **V1** | Core screener: discovery, storage, API, basic ranking | 🚧 In progress |
-| **V2** | Wallet Intelligence | ⏳ Planned |
-| **V3** | Contract Security | ⏳ Planned |
-| **V4** | Whale Tracking | ⏳ Planned |
-| **V5** | Social Intelligence | ⏳ Planned |
-| **V6** | Narrative Detection | ⏳ Planned |
-| **V7** | GitHub / Developer Analysis | ⏳ Planned |
-| **V8** | Machine Learning Pipeline | ⏳ Planned |
-| **V9** | Alpha Score Engine (ML-driven) | ⏳ Planned |
-| **V10** | Alert Engine | ⏳ Planned |
-| **V11** | React Dashboard | ⏳ Planned |
-| **V12** | Portfolio Tracking | ⏳ Planned |
-| **V13** | Paper Trading | ⏳ Planned |
-| **V14** | Backtesting | ⏳ Planned |
-| **V15** | AI Research Assistant | ⏳ Planned |
+### Phase 1 — Production Hardening & Testing (Immediate)
 
-> **Note:** V2 does not begin until V1 is explicitly approved and released.
+**Goal:** Move from functional prototype to production-ready system with comprehensive test coverage, CI/CD, and operational tooling.
+
+**Tasks:**
+
+1. **Comprehensive Test Suite**
+   - Unit tests for all 7 services (mock repositories, assert correct orchestration)
+   - Integration tests for all 10 repositories against a real test database
+   - API integration tests (httpx.ASGITransport against FastAPI app)
+   - Collector tests with respx HTTP mocking
+   - Frontend component tests for all pages and features
+   - Target: ≥85% code coverage
+
+2. **CI/CD Pipeline**
+   - GitHub Actions workflow: lint → type-check → test → coverage gate on every PR
+   - Docker image build + push workflow for tagged releases
+   - Pre-commit hooks configuration (`.pre-commit-config.yaml`)
+   - Automated Alembic migration checking in CI
+
+3. **Error Handling & Resilience**
+   - Graceful degradation when individual providers are unavailable
+   - Circuit breaker pattern for external API calls
+   - Dead-letter queue for failed job executions
+   - Enhanced error reporting with structured error codes
+
+4. **Production Docker Setup**
+   - Production Dockerfile (multi-stage: slim, non-root user, HEALTHCHECK)
+   - Production docker-compose with api + scheduler as separate services
+   - nginx/Traefik reverse proxy configuration
+   - Automated PostgreSQL backups (pg_dump with off-site retention)
+
+### Phase 2 — Wallet Intelligence V2 (Advanced)
+
+**Goal:** Move beyond basic holder aggregation to smart-money tracking, wallet clustering, and sophisticated pattern detection.
+
+**Tasks:**
+
+1. **Smart Money Tagging**
+   - VC wallet address database (seed from公开 sources)
+   - Exchange hot wallet detection (known address patterns)
+   - KOL/influencer wallet discovery
+   - Automated tag propagation via transaction graph analysis
+   - Confidence scoring for heuristic-based tags
+
+2. **Wallet Clustering**
+   - Same-owner wallet detection (funding source analysis)
+   - Cluster-level balance aggregation
+   - Multi-wallet accumulation pattern detection
+   - Cluster health scoring (diversity, vintage, success rate)
+
+3. **Accumulation/Selling Pattern Detection**
+   - Time-weighted average price (TWAP) vs. spot detection
+   - Tiered accumulation identification (slow/fast/aggressive)
+   - Distribution vs. profit-taking classification
+   - Pattern confidence scoring with historical accuracy tracking
+
+4. **Cross-Token Wallet Intelligence**
+   - Track wallet activity across multiple tokens
+   - Identify early buyers across launches
+   - Wallet-level alpha score (historical pick accuracy)
+   - Repeat-founder token detection
+
+### Phase 3 — ML Pipeline V8
+
+**Goal:** Build a production ML pipeline for feature engineering, model training, and inference — replacing hand-tuned scoring weights with data-driven models.
+
+**Tasks:**
+
+1. **Feature Engineering Pipeline**
+   - Historical feature store (time-series features for each token)
+   - Technical indicators (price action, volatility, liquidity depth)
+   - Wallet-derived features (holder concentration, whale ratio, smart money ratio)
+   - Social features (sentiment trajectory, engagement velocity, inorganic growth confidence)
+   - Developer features (commit frequency, team size estimate, code quality proxies)
+   - Narrative features (narrative momentum, category competition)
+   - Contract features (complexity score, ownership patterns, upgrade proxies)
+   - Cross-token features (ecosystem correlations, sector rotations)
+
+2. **Label Engineering**
+   - Outcome definition: "success" vs. "failure" at 7/14/30 day horizons
+   - Success criteria (multiple definitions for robustness):
+     - Price appreciation ≥X% with sustained liquidity
+     - Holder count growth
+     - Volume sustainability
+     - Combined composite label
+   - Label validation through manual review of edge cases
+   - Survival analysis for censored tokens (still trading at evaluation)
+
+3. **Model Training Pipeline**
+   - Baseline models: logistic regression, random forest, XGBoost, LightGBM, CatBoost
+   - Time-series-aware cross-validation (no lookahead bias)
+   - Hyperparameter optimization (Optuna/Ray Tune)
+   - Model ensemble strategies (stacking, voting, weighted averaging)
+   - Calibration curve analysis (reliability diagrams)
+   - Feature importance analysis (SHAP, permutation importance)
+
+4. **Model Evaluation & Selection**
+   - Backtesting framework (simulate historical decisions)
+   - Profitability simulation (if you'd acted on top-X scores)
+   - Sharpe ratio / information coefficient analysis
+   - Overfitting detection (train/test decay curves)
+   - Model explainability (SHAP values per prediction)
+
+5. **Inference Pipeline**
+   - Real-time feature computation service
+   - Model serving (ONNX runtime for latency-critical path)
+   - Prediction caching with TTL based on feature staleness
+   - Model versioning and A/B testing framework
+   - Drift detection (feature drift, prediction drift, concept drift)
+   - Automated model retriggering on drift alerts
+
+6. **MLOps Infrastructure**
+   - Feature store (Redis for online, PostgreSQL for offline)
+   - Model registry (MLflow tracking server)
+   - Experiment tracking with full reproducibility
+   - Pipeline orchestration (Prefect/Dagster/Airflow)
+   - Monitoring dashboard (feature distributions, prediction distributions, model performance)
+
+### Phase 4 — Alpha Score Engine V9 (ML-Driven)
+
+**Goal:** Replace the hand-tuned V1 Alpha Score with an ML-driven engine that learns optimal weights and discovers non-linear relationships from historical data.
+
+**Tasks:**
+
+1. **ML-Enhanced Scoring**
+   - ML model output as primary score component (60% weight)
+   - Hand-tuned factors retain 40% weight (fallback + explainability bridge)
+   - Dynamic weight adjustment based on model confidence
+   - Ensemble of horizon-specific models (7-day, 14-day, 30-day)
+
+2. **Model Interpretability Layer**
+   - SHAP waterfall charts per token score
+   - Natural language explanations ("This token scores highly primarily due to...")
+   - Counterfactual analysis ("What would need to change for this score to increase by 20 points?")
+   - Confidence interval for every score prediction
+
+3. **Continuous Learning**
+   - Online learning pipeline (model updates with new data without full retrain)
+   - Automated retraining schedule (weekly full retrain)
+   - Champion/challenger model evaluation
+   - Feedback loop from user-reported outcomes
+
+### Phase 5 — Alert Engine V10
+
+**Goal:** Push-based notification system for token events and score changes.
+
+**Tasks:**
+
+1. **Alert Configuration**
+   - User-configurable alert rules (web UI + API)
+   - Alert triggers:
+     - Score threshold crossings (enters/exits top X%)
+     - Whale events (new position, accumulation, distribution)
+     - Contract changes (ownership transfer, mint enable)
+     - Social inorganicity flags
+     - Price/volume/liquidity breakout detection
+     - New narrative emergence
+   - Cooldown periods to prevent alert fatigue
+   - Rate-limited alert delivery
+
+2. **Delivery Channels**
+   - Telegram bot integration (rich messages with token cards)
+   - Discord webhook integration (embeds with live data)
+   - Slack webhook integration
+   - Email digest (daily/weekly summary)
+   - Webhook API for custom integrations
+   - In-app notification feed in React dashboard
+
+3. **Alert Management**
+   - Alert history and audit log
+   - Acknowledge/mute/snooze controls
+   - Escalation policies (if no response in X minutes)
+   - Alert analytics (most triggered rules, false positive rate)
+
+### Phase 6 — React Dashboard V11 (Full Build)
+
+**Goal:** Complete the React SPA with all planned pages, real-time updates, and polished UX.
+
+**Tasks:**
+
+1. **Dashboard Overhaul**
+   - Metrics cards: total tokens tracked, new today, avg alpha score, top narrative
+   - Top movers (24h score change leaders)
+   - Recent whale activity timeline
+   - Narrative momentum chart
+   - Alert feed (unread count, recent alerts)
+   - System health summary
+   - Token discovery rate chart
+
+2. **Enhanced Token Detail**
+   - Complete all 9 tabs (Overview, Charts, Whales, Liquidity, Transactions, Social, Developer, Narratives, Risk)
+   - Liquidity tab: depth chart, pool composition, historical liquidity curve
+   - Transactions tab: recent large transactions, top buyers/sellers
+   - Risk tab: aggregated risk flags, honeypot analysis, tax analysis
+   - Price chart: multiple timeframes, volume overlay, MA indicators
+   - Score breakdown radar chart
+   - Similar tokens recommendation
+
+3. **Portfolio Tracking (V12 foundation)**
+   - Watchlist creation and management (persisted to backend)
+   - Portfolio balance tracking (manual entry initially)
+   - Token-level P&L with cost basis tracking
+   - Alpha Score-based rebalancing suggestions
+   - Portfolio-level aggregated metrics
+
+4. **UX Polish**
+   - Real-time updates via WebSocket (score changes, new tokens, whale events)
+   - Infinite scroll in token lists
+   - Keyboard shortcuts
+   - Saved filters and views
+   - Export to CSV/JSON
+   - Mobile-responsive layouts for all pages
+   - Skeleton loading states everywhere
+   - Dark mode refinements (custom themes, AMOLED mode)
+
+### Phase 7 — Portfolio Tracking V12 & Paper Trading V13
+
+**Goal:** Full portfolio tracking with paper trading simulation.
+
+**Tasks:**
+
+1. **Portfolio Management**
+   - Multi-portfolio support (separate strategies/accounts)
+   - Transaction logging (buy/sell/transfer with fees)
+   - Realized/unrealized P&L tracking
+   - Performance metrics (ROI, Sharpe, max drawdown, win rate)
+   - Tax lot accounting (FIFO, LIFO, specific identification)
+   - Portfolio rebalancing tracking
+
+2. **Paper Trading Engine**
+   - Simulated trade execution with configurable slippage
+   - Virtual balance management (per-portfolio)
+   - Order types: market, limit, stop-loss, take-profit
+   - Fill simulation based on actual pool data
+   - Execution delay modeling (realistic latency)
+   - Paper trading performance vs. actual token performance
+   - Leaderboard (optional, for community features)
+
+3. **Strategy Backtesting V14 Foundation**
+   - Strategy definition DSL (entry/exit rules, position sizing)
+   - Historical fill simulation with realistic liquidity constraints
+   - Performance reporting with benchmark comparisons
+   - Parameter optimization framework
+
+### Phase 8 — Backtesting V14 & AI Research Assistant V15
+
+**Goal:** Full historical backtesting engine and conversational AI interface.
+
+**Tasks:**
+
+1. **Backtesting Engine**
+   - Historical data replay at configurable tick frequency
+   - Strategy definition: entry conditions, exit conditions, position sizing, risk management
+   - Portfolio simulation with fees, slippage, liquidity constraints
+   - Batch backtest runner for parameter sweeps
+   - Performance analytics suite:
+     - Return metrics (CAGR, cumulative return, monthly return)
+     - Risk metrics (volatility, VaR, CVaR, max drawdown, ulcer index)
+     - Risk-adjusted metrics (Sharpe, Sortino, Calmar, Information Ratio)
+     - Trade statistics (win rate, avg win/loss, profit factor, expectancy)
+     - Market correlation analysis (beta, alpha, R-squared)
+   - Monte Carlo simulation for robustness testing
+   - Walk-forward analysis for strategy validation
+   - Benchmark comparison (buy-and-hold, top-10 equal weight, etc.)
+
+2. **AI Research Assistant**
+   - Natural language query interface ("Which tokens have strong developer activity but low social scores?")
+   - Conversational token analysis ("Why did this token's score drop 15 points?")
+   - Automated research report generation
+   - Pattern recognition queries ("Has this whale's accumulation pattern been predictive in the past?")
+   - Chat history with session management
+   - Multi-turn analysis with context retention
+   - Integration with LLM (Claude Sonnet/Opus for complex reasoning)
+   - RAG pipeline for on-chain + off-chain data retrieval
+   - Citation generation (every claim traceable to source data)
+
+### Phase 9 — Infrastructure & Production Scale
+
+**Goal:** Enterprise-grade infrastructure for production-scale operation.
+
+**Tasks:**
+
+1. **Multi-Region Deployment**
+   - Global load balancing (AWS Route53 / Cloudflare)
+   - Regional RPC endpoint selection for latency reduction
+   - Cross-region database replication
+   - Disaster recovery runbook
+
+2. **Read Replica Architecture**
+   - PostgreSQL read replicas for dashboard-heavy read traffic
+   - Automatic read/write splitting in repository layer
+   - Replica lag monitoring and read-your-writes consistency
+
+3. **Public API Tier**
+   - Free tier: rate-limited, historical data only, 1-hour delayed
+   - Pro tier: real-time, full endpoints, webhook delivery
+   - Enterprise tier: dedicated infrastructure, SLA, custom integrations
+   - API key management + usage tracking
+   - Developer portal with documentation + playground
+
+4. **Monitoring & Observability**
+   - Prometheus metrics endpoint (/metrics)
+   - Grafana dashboards (system, business, ML)
+   - OpenTelemetry distributed tracing
+   - AlertManager for operational alerts
+   - SLO/SLI tracking and reporting
+   - Cost attribution per provider/service
 
 ---
 
-## 27. Contributing
-
-**Branch strategy:** `main` (stable/release) ← `develop` (integration) ← `feature/<short-description>` branches.
-
-**Commit convention:** [Conventional Commits](https://www.conventionalcommits.org/) — `feat(scope): description`, `fix(scope): description`, `docs(scope): description`, `test(scope): description`.
-
-**Pull request process:** branch from `develop` → implement one milestone/feature per PR → ensure `pre-commit run --all-files` and `pytest` pass locally → open PR against `develop` → CI must pass before merge.
-
-**Code review expectations:** every PR needs at least one approval; reviewers check for type hints, docstrings, test coverage on new logic, and adherence to the layering rules in `docs/ARCHITECTURE.md`.
-
----
-
-## 28. Troubleshooting
-
-**`pytest` hangs or times out** — Postgres/Redis probably aren't up yet. Run `docker compose ps` and wait for both to show `healthy` before testing.
-
-**`alembic revision --autogenerate` produces an empty migration** — Alembic's `env.py` isn't seeing your models. Confirm `app/core/database/migrations/env.py` imports every model module (`from app.models import Chain, Token`).
-
-**`ModuleNotFoundError: No module named 'app'`** — you're likely running commands from the wrong directory, or the venv isn't activated. Run `which python3` and confirm it points into `.venv/bin/python3`; run commands from the repo root.
-
-**`respx` test fails with "no matching route"** — the mocked URL must exactly match what the client requests, including trailing slashes and query params.
-
-**Manual ingestion script inserts 0 rows** — some providers return chains outside our supported `Chain` enum; the normalizer correctly filters these out. Log `len(profiles)` vs. the ingested count to confirm this is filtering, not a bug.
-
-**`OperationalError` on a previously-working DB connection** — likely a stale pooled connection; confirm `pool_pre_ping=True` is set in `app/core/database/session.py` (it is, by default, in this codebase).
-
----
-
-## 29. Best Practices
-
-- Never bypass the Repository layer with raw SQLAlchemy queries in services or API routes.
-- Never call `os.getenv` outside `app/core/config/settings.py`.
-- Every new external API integration gets its own collector + normalizer pair, isolated from the rest of the system.
-- Every DTO crossing a layer boundary is a Pydantic model — never pass raw dicts between layers.
-- Run `pre-commit run --all-files` before every push, not just before a PR.
-
----
-
-## 30. Production Deployment
-
-**Reverse proxy:** deploy behind nginx or Traefik for TLS termination and request buffering; the FastAPI app itself should not be exposed directly to the internet. **HTTPS:** terminate TLS at the reverse proxy (Let's Encrypt via Traefik/certbot). **Backups:** automated daily PostgreSQL dumps (`pg_dump`) with off-site retention; test restores periodically — an untested backup is not a backup. **Secrets:** use your platform's secrets manager (AWS Secrets Manager, Doppler, Vault) rather than plain `.env` files in production; inject as environment variables at container start. **Scaling:** stateless API containers scale horizontally behind a load balancer; run collectors/scheduler as separate worker deployments so a slow provider API doesn't starve API request handling. **Disaster recovery:** documented runbook (planned) covering DB restore, Redis cache rebuild (it's a cache — safe to lose), and collector backfill procedures.
-
----
-
-## 31. Future Improvements
-
-- Multi-region deployment for RPC latency reduction on chain data collection
-- Read-replica routing for dashboard-heavy read traffic
-- Feature store for ML pipeline to avoid recomputing features across model retraining runs
-- Public API rate-limited free tier + authenticated higher-limit tier
-
----
-
-## 32. License
+## 17. License
 
 **Proprietary — all rights reserved.** *(Placeholder — update if/when this project is open-sourced under a specific license such as MIT or Apache 2.0.)*
-
----
-
-## 33. Acknowledgements
-
-Built on the shoulders of the open-source ecosystem: FastAPI, SQLAlchemy, Pydantic, structlog, the Python async ecosystem, and the public APIs (DexScreener, GeckoTerminal) that make token-level data accessible without running dedicated chain indexers from day one.
-
----
-
-## 34. Contact
-
-| Role | Contact |
-|---|---|
-| Maintainer | *(placeholder — add name/handle)* |
-| Issues | *(placeholder — add repository issue tracker link)* |
-| Discussions | *(placeholder — add Discord/Telegram community link)* |
